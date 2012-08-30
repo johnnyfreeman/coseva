@@ -1,8 +1,12 @@
 ![Coseva](https://fbb955dbd2c46c6e3194-d04b1cd5219d2087606844a09815488f.ssl.cf2.rackcdn.com/logos/coseva.png "Coseva")
 
-A classy object-oriented alternative for parsing CSV files.
+A classy object-oriented alternative for parsing CSV files with [PHP](http://www.php.net/).
 
 ![Screenshot](https://fbb955dbd2c46c6e3194-d04b1cd5219d2087606844a09815488f.ssl.cf2.rackcdn.com/coseva-screeny.png)
+
+# What is it?
+
+Coseva (pronounced co&bull;see&bull;vah) is a class for converting a .csv file into a PHP [Array](http://php.net/manual/en/language.types.array.php). It also has the capability of allowing you to register filters on rows and columns during the parsing stage.
 
 # Example
 
