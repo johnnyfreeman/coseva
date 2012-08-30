@@ -31,8 +31,13 @@ This method allows you to run a filter on a particular column of every row.
 	<tbody>
 	    <tr>
 	        <th>csv_column</th>
-	        <td>int</td>
-	        <td>int</td>
+	        <td><a href="http://www.php.net/manual/en/language.types.integer.php">Integer</a></td>
+	        <td>Zero-based column number.</td>
+	    </tr>
+	    <tr>
+	        <th>callable</th>
+	        <td><a href="http://www.php.net/manual/en/language.types.callable.php">Callable</a></td>
+	        <td>Callable receives the current value as the first parameter. Callable must return the new value.</td>
 	    </tr>
 	</tbody>
 </table>
