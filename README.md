@@ -32,17 +32,52 @@ There are a few principles you should know before diving right in. The first is 
 
 # API
 
-## __construct( filename, open_mode = 'r', $use_include_path = FALSE )
+### __construct( filename, open_mode = 'r', $use_include_path = FALSE )
 
 To read a csv file, just pass the path to the .csv file to the `CSV` constructor.
+    
+###### Parameters
 
-	$csv = new CSV('path/to/file.csv');
+<table>
+    <thead>
+	    <tr>
+	        <th>name</th>
+	        <th>type</th>
+	        <th>description</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    <tr>
+	        <th>filename</th>
+	        <td><a href="http://www.php.net/manual/en/language.types.string.php">String</a></td>
+	        <td>...</td>
+	    </tr>
+        <tr>
+	        <th>open_mode</th>
+	        <td><a href="http://www.php.net/manual/en/language.types.string.php">String</a></td>
+	        <td>...</td>
+	    </tr>
+        <tr>
+	        <th>use_include_path</th>
+	        <td><a href="http://www.php.net/manual/en/language.types.boolean.php">Boolean</a></td>
+	        <td>...</td>
+	    </tr>
+	</tbody>
+</table>
 
-## filterColumn( csv_column, callable)
+###### Returns
+
+Returns object id.
+
+###### Example
+
+    $csv = new CSV('path/to/file.csv');
+
+### filterColumn( csv_column, callable)
 
 This method allows you to run a filter on a particular column of every row.
 
-### Parameters
+###### Parameters
 
 <table>
 	<thead>
@@ -66,11 +101,11 @@ This method allows you to run a filter on a particular column of every row.
 	</tbody>
 </table>
 
-### Returns
+###### Returns
 
 Returns `TRUE` if *callable* is callable, `FALSE` otherwise.
 
-### Example
+###### Example
 
 	// split column four at every colon and serialize
 	$csv->filterColumn(4, function($value) {
