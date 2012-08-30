@@ -10,7 +10,7 @@ Coseva (pronounced co&bull;see&bull;vah) is a class for converting a .csv file i
 
 # Getting Started
 
-There are a few principles you should know before diving right in. The first is that Coseva doesn't do anything other than parse, and give you the results; no querying a database, no jumping on one foot. :)
+There are a few principles you should know before diving right in. The first is that Coseva doesn't do anything other than parse a csv, and give you the results; no querying a database, no jumping on one foot, etc. The second is the order in which filters are ran, this is very important. The parser loops through the file line by line, from top to bottom. At each line running, first all row filters and then all column filters.
 
 # Example
 
