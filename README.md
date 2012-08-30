@@ -18,12 +18,12 @@ There are a few principles you should know before diving right in. The first is 
 
 The recommended way to install Coseva is through [composer](http://getcomposer.org/). Just create a composer.json file and run the php composer.phar install command to install it:
 
-{
-    "minimum-stability": "dev",
-    "require": {
-        "johnnyfreeman/coseva": "*"
-    }
-}
+	{
+	    "minimum-stability": "dev",
+	    "require": {
+	        "johnnyfreeman/coseva": "*"
+	    }
+	}
 
 Alternatively, you can download the [coseva.zip](https://github.com/johnnyfreeman/coseva/zipball/master) file and extract it.
 
