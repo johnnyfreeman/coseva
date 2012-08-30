@@ -8,6 +8,10 @@ A classy object-oriented alternative for parsing CSV files with [PHP](http://www
 
 Coseva (pronounced co&bull;see&bull;vah) is a class for converting a .csv file into a PHP [Array](http://php.net/manual/en/language.types.array.php). It also has the capability of allowing you to register filters on rows and columns during the parsing stage.
 
+# Getting Started
+
+There are a few principles you should know before diving right in. The first is that Coseva doesn't do anything other than parse, and give you the results; no querying a database, no jumping on one foot. :)
+
 # Example
 
 	$csv = new CSV('path/to/file.csv');
