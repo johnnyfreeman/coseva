@@ -6,6 +6,18 @@ A classy object-oriented alternative for parsing CSV files.
 
 	$csv = new CSV('path/to/file.csv');
 
+    // parse first column as date
+	$csv->filterColumn(0, function(value) {
+	    return (new DateTime(value))->format('Y-m-d H:i:s');
+	});
+
+	// split column five at every colon and serialize
+	$csv->filterColumn(4, function($value) {
+	    return serialize(explode(':', $value));
+	});
+    
+    $csv->parse(1);
+
 # API
 
 ## __construct( filename, open_mode = 'r', $use_include_path = FALSE )
@@ -44,7 +56,7 @@ This method allows you to run a filter on a particular column of every row.
 
 ### Returns
 
-`NULL`
+Returns `TRUE` if *callable* is callable, `FALSE` otherwise.
 
 ### Example
 
