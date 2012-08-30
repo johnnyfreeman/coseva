@@ -7,28 +7,28 @@
 */
 class CSV
 {
-	protected $rows = array();
-	protected $columnFilters = array();
-	protected $rowFilters = array();
-	protected $file;
+	protected $_rows = array();
+	protected $_columnFilters = array();
+	protected $_rowFilters = array();
+	protected $_file;
 
 	function __construct($filename, $open_mode = 'r', $use_include_path = FALSE)
 	{
-		$this->file = new SplFileObject($filename, $open_mode, $use_include_path);
-		$this->file->setFlags(SplFileObject::READ_CSV);
+		$this->_file = new SplFileObject($filename, $open_mode, $use_include_path);
+		$this->_file->setFlags(SplFileObject::READ_CSV);
 	}
 
 	public function filterColumn($csv_column, $callable)
 	{
 		if (is_callable($callable)) {
-			$this->columnFilters[$csv_column][] = $callable;
+			$this->_columnFilters[$csv_column][] = $callable;
 		}
 	}
 
 	public function filterRow($callable)
 	{
 		if (is_callable($callable)) {
-			$this->rowFilters[] = $callable;
+			$this->_rowFilters[] = $callable;
 		}
 	}
 
@@ -164,15 +164,20 @@ class CSV
 		    foreach ($columns as $col => $value)
 		    {
 		    	// run column filters
-	    		if (isset($this->columnFilters[$col]))
+	    		if (isset($this->_columnFilters[$col]))
 	    		{
-	    			foreach ($this->columnFilters[$col] as $filter) {
+	    			foreach ($this->_columnFilters[$col] as $filter) {
 	    				$value = call_user_func($filter, $value);
 	    			}
 	    		}
 
-	    		$this->rows[$row][$col] = $value;
+	    		$this->_rows[$row][$col] = $value;
 	    	}
 		}
+	}
+
+	public function getRows()
+	{
+		return $this->_rows;
 	}
 }
