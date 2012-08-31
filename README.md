@@ -10,10 +10,6 @@ This (above) is an example of how to use Coseva in the simplest form. However, i
 
 Coseva (pronounced co&bull;see&bull;vah) is a class for converting a .csv file into a PHP [Array](http://php.net/manual/en/language.types.array.php). It also has the capability of allowing you to register filters on rows and columns during the parsing stage.
 
-# Getting Started
-
-There are a few principles you should know before diving right in. The first is that Coseva doesn't do anything other than parse a csv, and give you the results; no querying a database, no jumping on one foot, etc. That's left to you. The second is the order in which filters are ran. This is very important. The parser loops through the file line by line, from top to bottom. At each line it runs all row filters first and then all the column filters.
-
 # Installation
 
 The recommended way to install Coseva is through [composer](http://getcomposer.org/). Just create a composer.json file and run the php composer.phar install command to install it:
@@ -26,6 +22,10 @@ The recommended way to install Coseva is through [composer](http://getcomposer.o
 	}
 
 Alternatively, you can download the [coseva.zip](https://github.com/johnnyfreeman/coseva/zipball/master) file and extract it.
+
+# Getting Started
+
+There are a few principles you should know before diving right in. The first is that Coseva doesn't do anything other than parse a csv, and give you the results; no querying a database, no jumping on one foot, etc. That's left to you. The second is the order in which filters are ran. This is very important. The parser loops through the file line by line, from top to bottom. At each line it runs all row filters first and then all the column filters.
 
 # Examples
 
