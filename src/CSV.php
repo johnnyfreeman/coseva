@@ -3,13 +3,12 @@
 /**
 * Coseva
 * 
-* A classy, object-oriented alternative for parsing CSV files with PHP.
+* A friendly, object-oriented alternative for parsing CSV files with PHP.
 */
 class CSV
 {
     protected $_rows = array();
-    protected $_columnFilters = array();
-    protected $_rowFilters = array();
+    protected $_filters = array();
     protected $_file;
 
     function __construct($filename, $open_mode = 'r', $use_include_path = FALSE)
@@ -18,41 +17,35 @@ class CSV
         $this->_file->setFlags(SplFileObject::READ_CSV);
     }
 
-    public function filterColumn($csv_column, $callable)
+    public function filter(Closure $callable, Integer $column = null)
     {
-        if (is_callable($callable)) {
-            $this->_columnFilters[$csv_column][] = $callable;
-        }
-    }
-
-    public function filterRow($callable, $position = 'before')
-    {
-        if (is_callable($callable)) {
-            $this->_rowFilters[] = $callable;
-        }
+        $this->_filters[] = [
+            'callable' => $callable,
+            'column'   => $column
+        ];
     }
 
     public function parse($rowOffset = 0)
     {
-        foreach(new LimitIterator($this->_file, $rowOffset) as $row => $columns)
+        foreach(new LimitIterator($this->_file, $rowOffset) as $key => $row)
         {
-            foreach ($columns as $col => &$value)
-            {
-                // run column filters
-                if (isset($this->_columnFilters[$col]))
-                {
-                    foreach ($this->_columnFilters[$col] as $filter) {
-                        $value = call_user_func($filter, $value, $col);
-                    }
+            // run filters in the same order 
+            // they were registered
+            foreach ($this->_filters as $filter) {
+                $callable = $filter['callable'];
+                $column   = $filter['column'];
+
+                // entire row
+                if (null === $column) {
+                    $row = call_user_func($callable, $row);
+                }
+                // specific column
+                else {
+                    $row[$column] = call_user_func($callable, $row[$column]);
                 }
             }
 
-            // run row filters
-            foreach ($this->_rowFilters as $filter) {
-                $columns = call_user_func($filter, $columns, $row);
-            }
-
-            $this->_rows[$row] = $columns;
+            $this->_rows[$key] = $row;
         }
     }
 
