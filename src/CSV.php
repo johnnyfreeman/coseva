@@ -60,7 +60,7 @@ class CSV implements IteratorAggregate
     function __construct($filename, $open_mode = 'r', $use_include_path = FALSE)
     {
         if (!is_readable($filename)) {
-            throw new Exception($filename . ' is not readable.')
+            throw new Exception($filename . ' is not readable.');
         }
 
         $this->_fileConfig = array(
