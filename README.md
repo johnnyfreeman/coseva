@@ -21,7 +21,7 @@ The recommended way to install Coseva is through [composer](http://getcomposer.o
 	    }
 	}
 
-Alternatively, you can download the [coseva.zip](https://github.com/johnnyfreeman/coseva/zipball/master) file and extract it.
+Or, you can download the [coseva.zip](https://github.com/johnnyfreeman/coseva/zipball/master) file and extract it.
 
 # Getting Started
 
@@ -29,7 +29,22 @@ There are a few things you should know before diving in.
 
 The first thing, is that Coseva doesn't do anything other than parse a csv, and give you the results; no querying a database, no jumping on one foot, etc. That's left up to you. 
 
-The second thing is the order in which filters are run. The parser loops through the csv file, line by line, from top to bottom. At each line it runs all <del>row filters first and then all the column filters</del> <ins>filters in the same order they were registered in</ins>.
+The second thing is the order in which filters are run. The parser loops through the csv file, line by line, from top to bottom, and at each line it runs all filters in the same order they were registered in.
+
+So if we were to register two filters like this:
+
+    // trucate text in 1s column
+	$csv->filter(function($row) {
+		unset($row[0]);
+		return $row;
+	});
+
+	// Capitalize first letter of 1st column
+	$csv->filter(function($col) {
+	    return ucfirst($col);
+	}, 0);
+
+First, the first column will be deleted from the array, then during execution of the second filter a "PHP Notice: Undefined offset" will be raised because the column no longer exists.
 
 # Examples
 
