@@ -182,6 +182,22 @@ Returns `NULL`.
 	// parse csv while executing any filters that may have been registered.
 	$csv->parse();
 
+### toJSON()
+
+Use this to get the entire CSV in JSON format.
+
+###### Returns
+
+Returns a JSON `String`.
+
+###### Example
+
+    // register filters
+    // parse csv
+
+    // to JSON
+	echo $csv->toJSON();
+
 ### toTable()
 
 This is a great way to display the filtered contents of the csv to you during the development process (for debugging purposes).

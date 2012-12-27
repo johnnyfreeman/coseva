@@ -108,4 +108,9 @@ class CSV implements IteratorAggregate
 
         return $output;
     }
+
+    public function toJSON()
+    {
+        return json_encode($this->_rows);
+    }
 }
