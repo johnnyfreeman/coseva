@@ -10,11 +10,14 @@ namespace Coseva;
 use \SplFileObject;
 use \LimitIterator;
 use \Closure;
+use \ArrayAccess;
+use \Iterator;
+use \Countable;
 
 /**
  * CSV Class
  */
-class CSV
+class CSV implements ArrayAccess, Iterator, Countable
 {
     protected $_rows = array();
     protected $_filters = array();
@@ -65,9 +68,56 @@ class CSV
         }
     }
 
-    public function toArray()
+    // implement ArrayAccess
+    public function offsetSet($offset, $value)
     {
-        return $this->_rows;
+        if (is_null($offset)) {
+            $this->_rows[] = $value;
+        } else {
+            $this->_rows[$offset] = $value;
+        }
+    }
+
+    public function offsetExists($offset)
+    {
+        return isset($this->_rows[$offset]);
+    }
+
+    public function offsetUnset($offset)
+    {
+        unset($this->_rows[$offset]);
+    }
+
+    public function offsetGet($offset)
+    {
+        return isset($this->_rows[$offset]) ? $this->_rows[$offset] : null;
+    }
+
+    // implement Countable
+    public function count()
+    {
+        return count($this->_rows);
+    }
+
+    // implement Iterator
+    public function rewind() {
+        return reset($this->_rows);
+    }
+
+    public function current() {
+        return current($this->_rows);
+    }
+
+    public function key() {
+        return key($this->_rows);
+    }
+
+    public function next() {
+        return next($this->_rows);
+    }
+
+    public function valid() {
+        return false !== current($this->_rows);
     }
 
     public function toTable()
