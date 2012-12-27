@@ -89,12 +89,12 @@ class CSV implements IteratorAggregate
         // this filter is for the entire 
         // row, not just the column
         if (is_callable($column)) {
-            $this->_filters[] = ['callable' => $column,'column' => null];
+            $this->_filters[] = array('callable' => $column,'column' => null);
         }
         // otherwise assume this filter 
         // is specific to a column
         else {
-            $this->_filters[] = ['callable' => $callable,'column' => $column];
+            $this->_filters[] = array('callable' => $callable,'column' => $column);
         }
 
         return $this;
