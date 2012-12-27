@@ -1,7 +1,7 @@
 {
     "name": "johnnyfreeman/coseva",
     "type": "library",
-    "description": "A classy, object-oriented alternative for parsing CSV files with PHP.",
+    "description": "A friendly, object-oriented alternative for parsing CSV files with PHP.",
     "keywords": ["csv","parse"],
     "homepage": "https://github.com/johnnyfreeman/coseva",
     "license": "MIT",
