@@ -36,20 +36,20 @@ The second thing is the order in which filters are run. The parser loops through
 	$csv = new CSV('path/to/file.csv');
 
     // parse first column as date
-	$csv->filterColumn(0, function(value) {
+	$csv->filter(function(value) {
 	    return (new DateTime(value))->format('Y-m-d H:i:s');
-	});
+	}, 0);
 
 	// split column five at every colon and serialize
-	$csv->filterColumn(4, function($value) {
+	$csv->filter(function($value) {
 	    return serialize(explode(':', $value));
-	});
+	}, 4);
     
-    $csv->parse(1);
+    $csv->parse();
 
 # API
 
-### __construct( filename, open_mode = 'r', $use_include_path = FALSE )
+### __construct( $filename, $open_mode = 'r', $use_include_path = FALSE )
 
 To read a csv file, just pass the path to the .csv file to the `CSV` constructor.
     
@@ -65,17 +65,17 @@ To read a csv file, just pass the path to the .csv file to the `CSV` constructor
 	</thead>
 	<tbody>
 	    <tr>
-	        <th>filename</th>
+	        <th>$filename</th>
 	        <td><a href="http://www.php.net/manual/en/language.types.string.php">String</a></td>
 	        <td>...</td>
 	    </tr>
         <tr>
-	        <th>open_mode</th>
+	        <th>$open_mode</th>
 	        <td><a href="http://www.php.net/manual/en/language.types.string.php">String</a></td>
 	        <td>...</td>
 	    </tr>
         <tr>
-	        <th>use_include_path</th>
+	        <th>$use_include_path</th>
 	        <td><a href="http://www.php.net/manual/en/language.types.boolean.php">Boolean</a></td>
 	        <td>...</td>
 	    </tr>
@@ -90,7 +90,7 @@ Returns object id.
 
     $csv = new CSV('path/to/file.csv');
 
-### filterColumn( csv_column, callable)
+### filter( $callable, $column = null)
 
 This method allows you to run a filter on a particular column of every row.
 
@@ -106,25 +106,89 @@ This method allows you to run a filter on a particular column of every row.
 	</thead>
 	<tbody>
 	    <tr>
-	        <th>csv_column</th>
-	        <td><a href="http://www.php.net/manual/en/language.types.integer.php">Integer</a></td>
-	        <td>Zero-based column number.</td>
+	        <th>$callable</th>
+	        <td><a href="http://www.php.net/manual/en/language.types.callable.php">Callable</a></td>
+	        <td>Callable receives either the current row (as an array) or the current column (as a string) as the first parameter. The callable must return the new filtered row or column.</td>
 	    </tr>
 	    <tr>
-	        <th>callable</th>
-	        <td><a href="http://www.php.net/manual/en/language.types.callable.php">Callable</a></td>
-	        <td>Callable receives the current value as the first parameter. Callable must return the new value.</td>
+	        <th>$column</th>
+	        <td><a href="http://www.php.net/manual/en/language.types.integer.php">Integer</a></td>
+	        <td>Optional: Zero-based column number. If this parameter is preset the $callable will recieve the contents of the current column (as a string), and will receive the entire (array based) row otherwise.</td>
 	    </tr>
 	</tbody>
 </table>
 
 ###### Returns
 
-Returns `TRUE` if *callable* is callable, `FALSE` otherwise.
+Returns `NULL`
 
 ###### Example
 
 	// split column four at every colon and serialize
-	$csv->filterColumn(4, function($value) {
-	    return serialize(explode(':', $value));
+	$csv->filter(function($column4) {
+	    return serialize(explode(':', $column4));
+	}, 3);
+
+	// remove the first column from the results
+	$csv->filter(function($row) {
+		unset($row[0]);
+	    return $row;
 	});
+
+### parse( $offset = 0 )
+
+This method...
+
+###### Parameters
+
+<table>
+	<thead>
+	    <tr>
+	        <th>name</th>
+	        <th>type</th>
+	        <th>description</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    <tr>
+	        <th>$offset</th>
+	        <td><a href="http://www.php.net/manual/en/language.types.integer.php">Integer</a></td>
+	        <td>...</td>
+	    </tr>
+	</tbody>
+</table>
+
+###### Returns
+
+Returns `NULL`
+
+###### Example
+
+	// parse csv while executing any filters that may have been registered.
+	$csv->parse();
+
+### toArray()
+
+This method returns the parsed csv as a native PHP array.
+
+###### Returns
+
+Returns <a href="http://www.php.net/manual/en/language.types.array.php">Array</a>
+
+###### Example
+
+	foreach($csv->toArray() as $row) {
+		// persist each row to your datastore
+	}
+
+### toTable()
+
+This is a great way to display the csv to you during the development process for debugging purposes.
+
+###### Returns
+
+Returns `<a href="http://www.php.net/manual/en/language.types.string.php">String</a>`
+
+###### Example
+
+	echo $csv->toTable();
