@@ -49,7 +49,7 @@ The second thing is the order in which filters are run. The parser loops through
 
 # API
 
-### __construct( $filename )
+### __construct( $filename, $open_mode = 'r', $use_include_path = false )
 
 To read a csv file, just pass the path to the .csv file to the `CSV` constructor.
     
@@ -67,17 +67,17 @@ To read a csv file, just pass the path to the .csv file to the `CSV` constructor
 	    <tr>
 	        <th>$filename</th>
 	        <td><a href="http://www.php.net/manual/en/language.types.string.php">String</a></td>
-	        <td>...</td>
+	        <td>The file to read.</td>
 	    </tr>
         <tr>
 	        <th>$open_mode</th>
 	        <td><a href="http://www.php.net/manual/en/language.types.string.php">String</a></td>
-	        <td>...</td>
+	        <td>The mode in which to open the file. See <a href="http://php.net/manual/en/function.fopen.php">fopen()</a> for a list of allowed modes.</td>
 	    </tr>
         <tr>
 	        <th>$use_include_path</th>
 	        <td><a href="http://www.php.net/manual/en/language.types.boolean.php">Boolean</a></td>
-	        <td>...</td>
+	        <td>Whether to search in the <a href="http://php.net/manual/en/ini.core.php#ini.include-path">include_path</a> for filename.</td>
 	    </tr>
 	</tbody>
 </table>
