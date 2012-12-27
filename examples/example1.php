@@ -11,5 +11,5 @@ $csv->parse();
 
 // disco
 foreach ($csv as $row) {
-	echo '<pre>'; print_r($row); echo '</pre>';
+	// persist row to datastore or something
 }
