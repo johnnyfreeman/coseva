@@ -8,7 +8,7 @@ This (above) is an example of how to use Coseva in the simplest form. However, i
 
 # What is it?
 
-Coseva (pronounced co&bull;see&bull;vah) is a class for converting a .csv file into a PHP [Array](http://php.net/manual/en/language.types.array.php). It also has the capability of allowing you to register filters on rows and columns during the parsing stage.
+Coseva (pronounced co&bull;see&bull;vah) is a class for converting a .csv file into a PHP [Array](http://php.net/manual/en/language.types.array.php). But what makes it special is it also has the capability of allowing you to register "filters" on rows and columns to be executed during the parsing stage.
 
 # Installation
 
