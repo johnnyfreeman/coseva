@@ -11,6 +11,7 @@ use \SplFileObject;
 use \LimitIterator;
 use \IteratorAggregate;
 use \ArrayIterator;
+use \Exception;
 
 /**
  * CSV Class
@@ -41,6 +42,13 @@ class CSV implements IteratorAggregate
     protected $_file;
 
     /**
+     * Holds config options for opening the file
+     * 
+     * @var array
+     */
+    protected $_fileConfig = array();
+
+    /**
      * Constructor
      * -----------
      * To read a csv file, just pass the path to the .csv file to the CSV constructor.
@@ -51,8 +59,15 @@ class CSV implements IteratorAggregate
      */
     function __construct($filename, $open_mode = 'r', $use_include_path = FALSE)
     {
-        $this->_file = new SplFileObject($filename, $open_mode, $use_include_path);
-        $this->_file->setFlags(SplFileObject::READ_CSV);
+        if (!is_readable($filename)) {
+            throw new Exception($filename . ' is not readable.')
+        }
+
+        $this->_fileConfig = array(
+            'filename' => $filename,
+            'open_mode' => $open_mode,
+            'use_include_path' => $use_include_path
+        );
     }
 
     /**
@@ -95,6 +110,13 @@ class CSV implements IteratorAggregate
      */
     public function parse($rowOffset = 0)
     {
+        // open file
+        if (null === $this->_file) {
+            $this->_file = new SplFileObject($this->_fileConfig['filename'], $this->_fileConfig['open_mode'], $this->_fileConfig['use_include_path']);
+            $this->_file->setFlags(SplFileObject::READ_CSV);
+        }
+
+        // loop through CSV rows
         foreach(new LimitIterator($this->_file, $rowOffset) as $key => $row)
         {
             // run filters in the same order 
