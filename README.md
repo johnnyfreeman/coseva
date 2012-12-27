@@ -8,7 +8,7 @@ This (above) is an example of how to use Coseva in the simplest form. However, i
 
 # What is it?
 
-Coseva (pronounced co&bull;see&bull;vah) is an abstraction library for making .csv files easier to work with. But what makes it special is it allows you to have a [separation of concerns](http://en.wikipedia.org/wiki/Separation_of_concerns) in your data-filtering logic. This means that instead of having a bunch of spaghetti code wrapped up in a huge loop, you can easily encupsulate any data-filtering logic in it's own callback (Coseva calls this a "filter"), keeping your code maintainable and DRY.
+Coseva (pronounced co&bull;see&bull;vah) is an abstraction library for making .csv files easier to work with. But what makes it special is it allows you to have a [separation of concerns](http://en.wikipedia.org/wiki/Separation_of_concerns) in your data-filtering logic. This means that instead of having a bunch of spaghetti code wrapped up in a huge loop, you can easily encupsulate any task specific logic in it's own callback (Coseva calls this callback a "filter"), keeping your code maintainable and DRY.
 
 # Installation
 
@@ -107,7 +107,7 @@ Returns object id.
 
 ### filter( $column, $callable = null)
 
-This method allows you to run a filter on a particular column or the entire row by omitting the column parameter.
+This method allows you to register any number of filters on a particular column or an entire row.
 
 ###### Parameters
 
@@ -128,7 +128,7 @@ This method allows you to run a filter on a particular column or the entire row 
 	    <tr>
 	        <th>$callable</th>
 	        <td><a href="http://www.php.net/manual/en/language.types.callable.php">Callable</a></td>
-	        <td>Callable receives either the current row (as an array) or the current column (as a string) as the first parameter. The callable must return the new filtered row or column.</td>
+	        <td>Callable receives either the current row (as an array) or the current column (as a string) as the first parameter. The callable must return the new filtered row or column. Note: You can also use any native PHP functions that permit one parameter and return the new value, like [trim](http://us1.php.net/manual/en/function.trim.php), [htmlspecialchars](http://us1.php.net/manual/en/function.htmlspecialchars.php), [urlencode](http://us1.php.net/manual/en/function.urlencode.php), etc.</td>
 	    </tr>
 	</tbody>
 </table>
@@ -184,7 +184,7 @@ Returns `NULL`.
 
 ### toTable()
 
-This is a great way to display the csv to you during the development process for debugging purposes.
+This is a great way to display the filtered contents of the csv to you during the development process (for debugging purposes).
 
 ###### Returns
 
@@ -192,4 +192,8 @@ Returns an HTML `String`.
 
 ###### Example
 
+    // register filters
+    // parse csv
+
+    // let's take a look
 	echo $csv->toTable();
