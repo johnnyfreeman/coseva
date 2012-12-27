@@ -25,7 +25,11 @@ Alternatively, you can download the [coseva.zip](https://github.com/johnnyfreema
 
 # Getting Started
 
-There are a few principles you should know before diving right in. The first is that Coseva doesn't do anything other than parse a csv, and give you the results; no querying a database, no jumping on one foot, etc. That's left to you. The second is the order in which filters are ran. This is very important. The parser loops through the file line by line, from top to bottom. At each line it runs all row filters first and then all the column filters.
+There are a few things you should know before diving in. 
+
+The first thing, is that Coseva doesn't do anything other than parse a csv, and give you the results; no querying a database, no jumping on one foot, etc. That's left up to you. 
+
+The second thing is the order in which filters are run. The parser loops through the csv file, line by line, from top to bottom. At each line it runs all <del>row filters first and then all the column filters</del> <ins>filters in the same order they were registered in</ins>.
 
 # Examples
 
