@@ -10,4 +10,6 @@ $csv = new Coseva\CSV('example1.csv');
 $csv->parse();
 
 // disco
-echo $csv->toTable();
+foreach ($csv as $row) {
+	echo '<pre>'; print_r($row); echo '</pre>';
+}

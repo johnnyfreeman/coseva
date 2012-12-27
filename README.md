@@ -40,9 +40,9 @@ So if we were to register two filters like this:
 	});
 
 	// Capitalize first letter of 1st column
-	$csv->filter(function($col) {
+	$csv->filter(0, function($col) {
 	    return ucfirst($col);
-	}, 0);
+	});
 
 First, the first column will be deleted from the array, then during execution of the second filter a "PHP Notice: Undefined offset" will be raised because the column no longer exists.
 
@@ -51,14 +51,14 @@ First, the first column will be deleted from the array, then during execution of
 	$csv = new CSV('path/to/file.csv');
 
     // parse first column as date
-	$csv->filter(function($col1) {
+	$csv->filter(0, function($col1) {
 	    return (new DateTime($col1))->format('Y-m-d H:i:s');
-	}, 0);
+	});
 
 	// split column five at every colon and serialize
-	$csv->filter(function($col5) {
+	$csv->filter(4, function($col5) {
 	    return serialize(explode(':', $col5));
-	}, 4);
+	});
     
     $csv->parse();
 
@@ -105,9 +105,9 @@ Returns object id.
 
     $csv = new CSV('path/to/file.csv');
 
-### filter( $callable, $column = null)
+### filter( $column, $callable = null)
 
-This method allows you to run a filter on a particular column of every row.
+This method allows you to run a filter on a particular column or the entire row by omitting the column parameter.
 
 ###### Parameters
 
@@ -121,14 +121,14 @@ This method allows you to run a filter on a particular column of every row.
 	</thead>
 	<tbody>
 	    <tr>
-	        <th>$callable</th>
-	        <td><a href="http://www.php.net/manual/en/language.types.callable.php">Callable</a></td>
-	        <td>Callable receives either the current row (as an array) or the current column (as a string) as the first parameter. The callable must return the new filtered row or column.</td>
-	    </tr>
-	    <tr>
 	        <th>$column</th>
 	        <td><a href="http://www.php.net/manual/en/language.types.integer.php">Integer</a></td>
 	        <td>Optional: Zero-based column number. If this parameter is preset the $callable will recieve the contents of the current column (as a string), and will receive the entire (array based) row otherwise.</td>
+	    </tr>
+	    <tr>
+	        <th>$callable</th>
+	        <td><a href="http://www.php.net/manual/en/language.types.callable.php">Callable</a></td>
+	        <td>Callable receives either the current row (as an array) or the current column (as a string) as the first parameter. The callable must return the new filtered row or column.</td>
 	    </tr>
 	</tbody>
 </table>
@@ -140,9 +140,9 @@ Returns `NULL`
 ###### Example
 
 	// split column four at every colon and serialize
-	$csv->filter(function($column4) {
+	$csv->filter(3, function($column4) {
 	    return serialize(explode(':', $column4));
-	}, 3);
+	});
 
 	// remove the first column from the results
 	$csv->filter(function($row) {
@@ -181,20 +181,6 @@ Returns `NULL`.
 
 	// parse csv while executing any filters that may have been registered.
 	$csv->parse();
-
-### toArray()
-
-This method returns the parsed csv as a native PHP array.
-
-###### Returns
-
-Returns an `Array` of the parsed csv file.
-
-###### Example
-
-	foreach($csv->toArray() as $row) {
-		// persist each row to your datastore
-	}
 
 ### toTable()
 

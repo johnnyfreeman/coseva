@@ -26,12 +26,19 @@ class CSV
         $this->_file->setFlags(SplFileObject::READ_CSV);
     }
 
-    public function filter(Closure $callable, $column = null)
+    public function filter($column, callable $callable = null )
     {
-        $this->_filters[] = [
-            'callable' => $callable,
-            'column'   => $column
-        ];
+        // if column is callable assume 
+        // this filter is for the entire 
+        // row, not just the column
+        if (is_callable($column)) {
+            $this->_filters[] = ['callable' => $column,'column' => null];
+        }
+        // otherwise assume this filter 
+        // is specific to a column
+        else {
+            $this->_filters[] = ['callable' => $callable,'column' => $column];
+        }
     }
 
     public function parse($rowOffset = 0)
@@ -65,17 +72,16 @@ class CSV
 
     public function toTable()
     {
-        $rows = $this->toArray();
-        $num_rows = count($rows);
+        $num_rows = count($this);
 
         // begin drawing table
         $output = '<table border="1" cellspacing="1" cellpadding="3">';
 
-        if (count($this->_rows)) {
+        if ($num_rows) {
 
             // thead
             $output .= '<thead><tr><th>&nbsp;</th>';
-            foreach ($rows as $row) {
+            foreach ($this as $row) {
                 foreach ($row as $key => $col) {
                     $output .= '<th>' . $key .  '</th>';
                 }
@@ -85,7 +91,7 @@ class CSV
 
             // tbody
             $output .= '<tbody>';
-            foreach ($rows as $i => $row) {
+            foreach ($this as $i => $row) {
                 $output .= '<tr>';
                 $output .= '<th>' . $i . '</th>';
                 foreach ($row as $col) {
