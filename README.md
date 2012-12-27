@@ -49,7 +49,7 @@ The second thing is the order in which filters are run. The parser loops through
 
 # API
 
-### __construct( $filename, $open_mode = 'r', $use_include_path = FALSE )
+### __construct( $filename )
 
 To read a csv file, just pass the path to the .csv file to the `CSV` constructor.
     
@@ -137,7 +137,7 @@ Returns `NULL`
 
 ### parse( $offset = 0 )
 
-This method...
+This method will convert the csv to an array and run all registered filters against it.
 
 ###### Parameters
 
@@ -153,14 +153,14 @@ This method...
 	    <tr>
 	        <th>$offset</th>
 	        <td><a href="http://www.php.net/manual/en/language.types.integer.php">Integer</a></td>
-	        <td>...</td>
+	        <td>Determines which row the parser will start on. Zero-based index.</td>
 	    </tr>
 	</tbody>
 </table>
 
 ###### Returns
 
-Returns `NULL`
+Returns `NULL`.
 
 ###### Example
 
@@ -173,7 +173,7 @@ This method returns the parsed csv as a native PHP array.
 
 ###### Returns
 
-Returns <a href="http://www.php.net/manual/en/language.types.array.php">Array</a>
+Returns an `Array` of the parsed csv file.
 
 ###### Example
 
@@ -187,7 +187,7 @@ This is a great way to display the csv to you during the development process for
 
 ###### Returns
 
-Returns `<a href="http://www.php.net/manual/en/language.types.string.php">String</a>`
+Returns an HTML `String`.
 
 ###### Example
 
