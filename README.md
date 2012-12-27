@@ -1,6 +1,6 @@
 ![Coseva](http://coseva.s3.amazonaws.com/logo.png "Coseva")
 
-A friendly, object-oriented alternative for parsing CSV files with [PHP](http://www.php.net/).
+A friendly, object-oriented library for parsing and filtering CSV files with [PHP](http://www.php.net/).
 
 ![Screenshot](http://coseva.s3.amazonaws.com/editor.png)
 
