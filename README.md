@@ -1,8 +1,8 @@
-![Coseva](https://fbb955dbd2c46c6e3194-d04b1cd5219d2087606844a09815488f.ssl.cf2.rackcdn.com/logos/coseva.png "Coseva")
+![Coseva](http://coseva.s3.amazonaws.com/logo.png "Coseva")
 
-A classy object-oriented alternative for parsing CSV files with [PHP](http://www.php.net/).
+A friendly, object-oriented alternative for parsing CSV files with [PHP](http://www.php.net/).
 
-![Screenshot](https://fbb955dbd2c46c6e3194-d04b1cd5219d2087606844a09815488f.ssl.cf2.rackcdn.com/coseva-screeny.png)
+![Screenshot](http://coseva.s3.amazonaws.com/editor.png)
 
 This (above) is an example of how to use Coseva in the simplest form. However, it is much more capable than this. :)
 
