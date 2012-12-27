@@ -213,3 +213,7 @@ Returns an HTML `String`.
 
     // let's take a look
 	echo $csv->toTable();
+
+# Updates
+
+Want to stay updated? Follow me on [Github](https://github.com/johnnyfreeman) and [Twitter](http://twitter.com/prsjohnny).
