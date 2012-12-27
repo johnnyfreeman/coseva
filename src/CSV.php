@@ -1,10 +1,18 @@
 <?php
 
 /**
-* Coseva
-* 
-* A friendly, object-oriented alternative for parsing CSV files with PHP.
-*/
+ * Coseva
+ * 
+ * A friendly, object-oriented alternative for parsing and filtering CSV files with PHP.
+ */
+namespace Coseva;
+
+use \SplFileObject;
+use \LimitIterator;
+
+/**
+ * CSV Class
+ */
 class CSV
 {
     protected $_rows = array();
@@ -60,10 +68,11 @@ class CSV
         $num_rows = count($rows);
 
         // begin drawing table
-        $output = '<table border="1" cellspacing="1" cellpadding="1">';
+        $output = '<table border="1" cellspacing="1" cellpadding="3">';
 
-        // thead
         if (count($this->_rows)) {
+
+            // thead
             $output .= '<thead><tr><th>&nbsp;</th>';
             foreach ($rows as $row) {
                 foreach ($row as $key => $col) {
@@ -77,7 +86,7 @@ class CSV
             $output .= '<tbody>';
             foreach ($rows as $i => $row) {
                 $output .= '<tr>';
-                $output .= '<td>' . $i . '</td>';
+                $output .= '<th>' . $i . '</th>';
                 foreach ($row as $col) {
                      $output .= '<td>' . $col .  '</td>';
                 }
@@ -86,6 +95,7 @@ class CSV
             $output .= '</tbody>';
         }
         
+        // close table
         $output .= '</table>';
 
         return $output;
