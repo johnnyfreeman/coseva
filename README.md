@@ -12,7 +12,7 @@ Coseva (pronounced co&bull;see&bull;vah) is a class for converting a .csv file i
 
 # Installation
 
-The recommended way to install Coseva is through [composer](http://getcomposer.org/). Just create a composer.json file and run the php composer.phar install command to install it:
+The recommended way to install Coseva is through [composer](http://getcomposer.org/). Just create a composer.json file and run the `composer install` command to install it:
 
 	{
 	    "minimum-stability": "dev",
