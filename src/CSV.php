@@ -9,6 +9,7 @@ namespace Coseva;
 
 use \SplFileObject;
 use \LimitIterator;
+use \Closure;
 
 /**
  * CSV Class
@@ -25,7 +26,7 @@ class CSV
         $this->_file->setFlags(SplFileObject::READ_CSV);
     }
 
-    public function filter(Closure $callable, Integer $column = null)
+    public function filter(Closure $callable, $column = null)
     {
         $this->_filters[] = [
             'callable' => $callable,

@@ -51,13 +51,13 @@ First, the first column will be deleted from the array, then during execution of
 	$csv = new CSV('path/to/file.csv');
 
     // parse first column as date
-	$csv->filter(function(value) {
-	    return (new DateTime(value))->format('Y-m-d H:i:s');
+	$csv->filter(function($col1) {
+	    return (new DateTime($col1))->format('Y-m-d H:i:s');
 	}, 0);
 
 	// split column five at every colon and serialize
-	$csv->filter(function($value) {
-	    return serialize(explode(':', $value));
+	$csv->filter(function($col5) {
+	    return serialize(explode(':', $col5));
 	}, 4);
     
     $csv->parse();
