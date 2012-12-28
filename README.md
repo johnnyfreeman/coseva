@@ -130,8 +130,8 @@ The second method, you'll pass only a callback, like so:
 		return $row;
 	});
 
-	// completely remove the last column from the row
-	$csv->filter('array_pop');
+	// reverse the order of all columns
+	$csv->filter('array_reverse');
 
 ###### Parameters
 
