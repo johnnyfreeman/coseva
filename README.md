@@ -46,7 +46,7 @@ So if we were to register two filters like this:
 
 First, the first column will be deleted from the array, then during execution of the second filter a "PHP Notice: Undefined offset" will be raised because the column no longer exists.
 
-# Examples
+# Example
 
 	$csv = new CSV('path/to/file.csv');
 
