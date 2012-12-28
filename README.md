@@ -105,9 +105,33 @@ Returns object id.
 
     $csv = new CSV('path/to/file.csv');
 
-### filter( $column, $callable = null)
+### filter( $column, $callable )
 
-This method allows you to register any number of filters on a particular column or an entire row.
+This method allows you to register any number of filters on your CSV content. But there are two ways you can utilize this method. 
+
+The first method, you'll pass a column number and a callable, like so:
+	
+	// convert data in column 2 to a `number` if it is numeric
+    $csv->filter(1, function($value) {
+    	return is_numeric($value) ? (float) $value : $value;
+	});
+
+	// trim the whitespace around column 1
+	$csv->filter(0, 'trim');
+
+The second method, you'll pass only a callback, like so:
+
+	// overwrite column three based on values from columns 1 and 2
+	$csv->filter(function($row) {
+		if ($row[0] == 'this' && $row[1] == 'that') {
+			$row[2] = 'something';
+		}
+
+		return $row;
+	});
+
+	// completely remove the last column from the row
+	$csv->filter('array_pop');
 
 ###### Parameters
 
@@ -123,12 +147,12 @@ This method allows you to register any number of filters on a particular column 
 	    <tr>
 	        <th>$column</th>
 	        <td><a href="http://www.php.net/manual/en/language.types.integer.php">Integer</a></td>
-	        <td>Optional: Zero-based column number. If this parameter is preset the $callable will recieve the contents of the current column (as a string), and will receive the entire (array based) row otherwise.</td>
+	        <td>Optional: Zero-based column number. If this parameter is present the $callable will recieve the contents of the current column (as a string), and will receive the entire (array based) row otherwise.</td>
 	    </tr>
 	    <tr>
 	        <th>$callable</th>
 	        <td><a href="http://www.php.net/manual/en/language.types.callable.php">Callable</a></td>
-	        <td>Callable receives either the current row (as an array) or the current column (as a string) as the first parameter. The callable must return the new filtered row or column. Note: You can also use any native PHP functions that permit one parameter and return the new value, like [trim](http://us1.php.net/manual/en/function.trim.php), [htmlspecialchars](http://us1.php.net/manual/en/function.htmlspecialchars.php), [urlencode](http://us1.php.net/manual/en/function.urlencode.php), etc.</td>
+	        <td>Callable receives either the current row (as an array) or the current column (as a string) as the first parameter. The callable must return the new filtered row or column. Note: You can also use any native PHP functions that permit one parameter and return the new value, like <a href="http://us1.php.net/manual/en/function.trim.php">trim</a>, <a href="http://us1.php.net/manual/en/function.htmlspecialchars.php">htmlspecialchars</a>, <a href="http://us1.php.net/manual/en/function.urlencode.php">urlencode</a>, etc.</td>
 	    </tr>
 	</tbody>
 </table>
