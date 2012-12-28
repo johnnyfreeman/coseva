@@ -66,7 +66,7 @@ First, the first column will be deleted from the array, then during execution of
 
 ### __construct( $filename, $open_mode = 'r', $use_include_path = false )
 
-To read a csv file, just pass the path to the .csv file to the `CSV` constructor.
+To instantiate the `CSV` object, just pass the path to the .csv file to the `CSV` constructor.
     
 ###### Parameters
 
@@ -159,7 +159,7 @@ The second method, you'll pass only a callback, like so:
 
 ###### Returns
 
-Returns `NULL`
+Returns the `CSV` instance to allow [method chaining](http://en.wikipedia.org/wiki/Method_chaining).
 
 ###### Example
 
@@ -199,7 +199,7 @@ This method will convert the csv to an array and run all registered filters agai
 
 ###### Returns
 
-Returns `NULL`.
+Returns the `CSV` instance to allow [method chaining](http://en.wikipedia.org/wiki/Method_chaining).
 
 ###### Example
 
