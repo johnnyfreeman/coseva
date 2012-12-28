@@ -8,7 +8,7 @@ This (above) is an example of how to use Coseva in the simplest form. However, i
 
 # What is it?
 
-Coseva (pronounced co&bull;see&bull;vah) is an abstraction library for making .csv files easier to work with. But what makes it special is it allows you to have a [separation of concerns](http://en.wikipedia.org/wiki/Separation_of_concerns) in your data-filtering logic. This means that instead of having a bunch of spaghetti code wrapped up in a huge loop, you can easily encupsulate any task specific logic in it's own callback (Coseva calls this callback a "filter"), keeping your code maintainable and DRY.
+Coseva (pronounced co&bull;see&bull;vah) is an abstraction library for making .csv files easier to work with. But what makes it special is it allows you to have a [separation of concerns](http://en.wikipedia.org/wiki/Separation_of_concerns) in your data-filtering logic. This is one of the main points of Coseva, to give the developer the ability to keep unrelated logic separate from each other. In many cases, all data-filtering logic is contained in one big loop. This "spaghetti code" leads to a codebase that is increasingly difficult to maintain and update, and near impossible to read months later when you come back to it. But by breaking down your logic into smaller distinct chunks (Coseva calls these chunks "filters"), you can avoid many of the headaches that come with programming.
 
 # Installation
 
