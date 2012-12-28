@@ -6,6 +6,8 @@
 	// read
 	$csv = new Coseva\CSV('example1.csv');
 
+	$csv->filter('array_shift');
+
 	// parse
 	$csv->parse();
 

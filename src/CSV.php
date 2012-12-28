@@ -127,11 +127,11 @@ class CSV implements IteratorAggregate
 
                 // entire row
                 if (null === $column) {
-                    $row = call_user_func($callable, $row);
+                    $row = call_user_func_array($callable, array(&$row));
                 }
                 // specific column
                 else {
-                    $row[$column] = call_user_func($callable, $row[$column]);
+                    $row[$column] = call_user_func_array($callable, array(&$row[$column]));
                 }
             }
 
