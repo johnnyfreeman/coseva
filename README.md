@@ -109,7 +109,7 @@ To instantiate the `CSV` object, just pass the path to the .csv file to the `CSV
 
 ###### Returns
 
-Returns object id.
+Returns CSV instance.
 
 ###### Example
 
@@ -262,9 +262,30 @@ Returns an HTML `String`.
 echo $csv->toTable();
 ```
 
-### getInstance()
+### getInstance( $filename )
 
 We also allow for instances, preserving memory and maintaining reachability across scopes.
+
+###### Parameters
+
+<table>
+	<thead>
+	    <tr>
+	        <th>name</th>
+	        <th>type</th>
+	        <th>description</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    <tr>
+	        <th>$filename</th>
+	        <td><a href="http://www.php.net/manual/en/language.types.string.php">String</a></td>
+	        <td>A readable filename to reference the instances by. The filename will be resolved to the absolute path, following symlinks, to improve chances of finding a matching instance.</td>
+	    </tr>
+	</tbody>
+</table>
+
+###### Example
 
 ```php
 <?php
