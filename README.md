@@ -14,60 +14,70 @@ Coseva (pronounced co&bull;see&bull;vah) is an abstraction library for making .c
 
 The recommended way to install Coseva is through [composer](http://getcomposer.org/). Just create a composer.json file and run the `composer install` command to install it:
 
-	{
-	    "minimum-stability": "dev",
-	    "require": {
-	        "johnnyfreeman/coseva": "*"
-	    }
-	}
+```javascript
+{
+    "minimum-stability": "dev",
+    "require": {
+        "johnnyfreeman/coseva": "*"
+    }
+}
+```
 
 Or, you can download the [coseva.zip](https://github.com/johnnyfreeman/coseva/zipball/master) file and extract it.
 
 # Getting Started
 
-There are a few things you should know before diving in. 
+There are a few things you should know before diving in.
 
-The first thing, is that Coseva doesn't do anything other than parse a csv, and give you the results; no querying a database, no jumping on one foot, etc. That's left up to you. 
+The first thing, is that Coseva doesn't do anything other than parse a csv, and give you the results; no querying a database, no jumping on one foot, etc. That's left up to you.
 
 The second thing is the order in which filters are run. The parser loops through the csv file, line by line, from top to bottom, and at each line it runs all filters in the same order they were registered in.
 
 So if we were to register two filters like this:
 
-    // trucate text in 1s column
-	$csv->filter(function($row) {
-		unset($row[0]);
-		return $row;
-	});
+```php
+<?php
 
-	// Capitalize first letter of 1st column
-	$csv->filter(0, function($col) {
-	    return ucfirst($col);
-	});
+// trucate text in 1s column
+$csv->filter(function($row) {
+	unset($row[0]);
+	return $row;
+});
+
+// Capitalize first letter of 1st column
+$csv->filter(0, function($col) {
+    return ucfirst($col);
+});
+```
 
 First, the first column will be deleted from the array, then during execution of the second filter a "PHP Notice: Undefined offset" will be raised because the column no longer exists.
 
 # Example
 
-	$csv = new CSV('path/to/file.csv');
+```php
+<?php
 
-    // parse first column as date
-	$csv->filter(0, function($col1) {
-	    return (new DateTime($col1))->format('Y-m-d H:i:s');
-	});
+$csv = new CSV('path/to/file.csv');
 
-	// split column five at every colon and serialize
-	$csv->filter(4, function($col5) {
-	    return serialize(explode(':', $col5));
-	});
-    
-    $csv->parse();
+// parse first column as date
+$csv->filter(0, function($col1) {
+    return (new DateTime($col1))->format('Y-m-d H:i:s');
+});
+
+// split column five at every colon and serialize
+$csv->filter(4, function($col5) {
+    return serialize(explode(':', $col5));
+});
+
+$csv->parse();
+```
 
 # API
 
 ### __construct( $filename, $open_mode = 'r', $use_include_path = false )
 
 To instantiate the `CSV` object, just pass the path to the .csv file to the `CSV` constructor.
-    
+
 ###### Parameters
 
 <table>
@@ -103,14 +113,18 @@ Returns object id.
 
 ###### Example
 
-    $csv = new CSV('path/to/file.csv');
+```php
+<?php
+
+$csv = new CSV('path/to/file.csv');
+```
 
 ### filter( $column, $callable )
 
-This method allows you to register any number of filters on your CSV content. But there are two ways you can utilize this method. 
+This method allows you to register any number of filters on your CSV content. But there are two ways you can utilize this method.
 
 The first method, you'll pass a column number and a callable, like so:
-	
+
 	// convert data in column 2 to a `number` if it is numeric
     $csv->filter(1, function($value) {
     	return is_numeric($value) ? (float) $value : $value;
@@ -163,16 +177,20 @@ Returns the `CSV` instance to allow [method chaining](http://en.wikipedia.org/wi
 
 ###### Example
 
-	// split column four at every colon and serialize
-	$csv->filter(3, function($column4) {
-	    return serialize(explode(':', $column4));
-	});
+```php
+<?php
 
-	// remove the first column from the results
-	$csv->filter(function($row) {
-		unset($row[0]);
-	    return $row;
-	});
+// split column four at every colon and serialize
+$csv->filter(3, function($column4) {
+    return serialize(explode(':', $column4));
+});
+
+// remove the first column from the results
+$csv->filter(function($row) {
+	unset($row[0]);
+    return $row;
+});
+```
 
 ### parse( $offset = 0 )
 
@@ -203,8 +221,12 @@ Returns the `CSV` instance to allow [method chaining](http://en.wikipedia.org/wi
 
 ###### Example
 
-	// parse csv while executing any filters that may have been registered.
-	$csv->parse();
+```php
+<?php
+
+// parse csv while executing any filters that may have been registered.
+$csv->parse();
+```
 
 ### toJSON()
 
@@ -216,11 +238,12 @@ Returns a JSON `String`.
 
 ###### Example
 
-    // register filters
-    // parse csv
+```php
+<?php
 
-    // to JSON
-	echo $csv->toJSON();
+// to JSON
+echo $csv->toJSON();
+```
 
 ### toTable()
 
@@ -232,11 +255,35 @@ Returns an HTML `String`.
 
 ###### Example
 
-    // register filters
-    // parse csv
+```php
+<?php
 
-    // let's take a look
-	echo $csv->toTable();
+// let's take a look
+echo $csv->toTable();
+```
+
+### getInstance()
+
+We also allow for instances, preserving memory and maintaining reachability across scopes.
+
+```php
+<?php
+
+use \Coseva\CSV;
+
+// Create an instance of CSV.
+$csv = CSV::getInstance('comma-separated-nonsense.csv');
+
+// Fetch another one.
+$dupe = CSV::getInstance('comma-separated-nonsense.csv');
+
+// Parse the CSV.
+$csv->parse();
+
+// And display that parsed CSV as JSON.
+echo $dupe->toJSON();
+
+```
 
 # Updates
 
