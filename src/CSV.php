@@ -62,6 +62,13 @@ class CSV implements IteratorAggregate {
   );
 
   /**
+   * An array of instances of CSV to prevent unnecessary parsing of CSV files.
+   *
+   * @var array $_instances A list of CSV instances, keyed by filename
+   */
+  private static $_instances = array();
+
+  /**
    * Constructor for CSV.
    *
    * To read a csv file, just pass the path to the .csv file.
@@ -94,6 +101,41 @@ class CSV implements IteratorAggregate {
       // Explicitely cast this as a boolean to ensure proper bevahior.
       'use_include_path' => (bool) $use_include_path
     );
+  }
+
+  /**
+   * Get an instance of CSV, based on the filename.
+   *
+   * Note: Because PHP's integer type is signed and many platforms use 32bit
+   * integers, some filesystem functions may return unexpected results for
+   * files which are larger than 2GB.
+   *
+   * @param string $filename the CSV file to read. Should be readable.
+   *   Filenames will be resolved. Symlinks will be followed.
+   * @see http://php.net/manual/en/function.realpath.php
+   * @throws InvalidArgumentException if the absolute path of the file could
+   *   not be resolved.
+   * @return CSV self::$_instances[$filename]
+   */
+  public static function getInstance($filename) {
+    // Resolve the path, so there is a better likelihood of finding a match.
+    $filename = realpath($filename);
+
+    if (!$filename) throw new InvalidArgumentException(
+      'The fiven filename could not be resolved. Tried resolving "'
+      . $filename . '"'
+    );
+
+    // Check if an instance exists. If not, create one.
+    if (!isset(self::$_instances[$filename])) {
+      // Collect the class name. This won't break when the class name changes.
+      $class = __CLASS__;
+
+      // Create a new instance of this class.
+      self::$_instances[$filename] = new $class($filename);
+    }
+
+    return self::$_instances[$filename];
   }
 
   /**
