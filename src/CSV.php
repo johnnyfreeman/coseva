@@ -28,7 +28,7 @@ class CSV implements IteratorAggregate {
    *
    * @var array $_rows the rows found in the CSV resource
    */
-  protected $_rows = array();
+  protected $_rows;
 
   /**
    * Storage for filter callbacks to be executed during the parsing stage.
@@ -83,14 +83,14 @@ class CSV implements IteratorAggregate {
    */
   function __construct($filename, $open_mode = 'r', $use_include_path = false) {
     // Check if the given filename was readable.
-    if (!is_readable($filename)) {
-      throw new InvalidArgumentException($filename . ' is not readable.');
-    }
+    if (!is_readable($filename)) throw new InvalidArgumentException(
+      var_export($filename, true) . ' is not readable.'
+    );
 
     // Check if the given open mode was valid.
     if (!in_array($open_mode, self::$_availableOpenModes)) {
       throw new InvalidArgumentException(
-        'Unknown open mode "' . $open_mode . '".'
+        'Unknown open mode ' . var_export($open_mode, true) . '.'
       );
     }
 
@@ -119,12 +119,14 @@ class CSV implements IteratorAggregate {
    */
   public static function getInstance($filename) {
     // Resolve the path, so there is a better likelihood of finding a match.
-    $filename = realpath($filename);
+    $path = realpath($filename);
 
-    if (!$filename) throw new InvalidArgumentException(
-      'The fiven filename could not be resolved. Tried resolving "'
-      . $filename . '"'
+    if (!$path) throw new InvalidArgumentException(
+      'The fiven filename could not be resolved. Tried resolving '
+      . var_export($filename, true)
     );
+
+    $filename = $path;
 
     // Check if an instance exists. If not, create one.
     if (!isset(self::$_instances[$filename])) {
@@ -163,8 +165,8 @@ class CSV implements IteratorAggregate {
       );
 
       if (!is_numeric($column)) throw new InvalidArgumentException(
-        'No proper column index provided. Expected a numeric, while given "'
-        . $column . '"'
+        'No proper column index provided. Expected a numeric, while given '
+        . var_export($column, true)
       );
     }
 
@@ -190,26 +192,83 @@ class CSV implements IteratorAggregate {
    *
    * @param integer $rowOffset Determines which row the parser will start on.
    *   Zero-based index.
+   *   Note: When using a row offset, skipped rows will never be parsed nor
+   *   stored. As such, we encourage to use different instances when mixing
+   *   offsets, to prevent resultsets from interfering.
    * @return CSV $this
    */
   public function parse($rowOffset = 0) {
     // Cast the row offset as an integer.
     $rowOffset = (int) $rowOffset;
 
-    // Open the file if there is no SplFIleObject present.
-    if (!($this->_file instanceof SplFileObject)) {
-      $this->_file = new SplFileObject(
-        $this->_fileConfig['filename'],
-        $this->_fileConfig['open_mode'],
-        $this->_fileConfig['use_include_path']
-      );
+    if (!isset($this->_rows)) {
+      // Open the file if there is no SplFIleObject present.
+      if (!($this->_file instanceof SplFileObject)) {
+        $this->_file = new SplFileObject(
+          $this->_fileConfig['filename'],
+          $this->_fileConfig['open_mode'],
+          $this->_fileConfig['use_include_path']
+        );
 
-      // Set the flag to parse CSV.
-      $this->_file->setFlags(SplFileObject::READ_CSV);
+        // Set the flag to parse CSV.
+        $this->_file->setFlags(SplFileObject::READ_CSV);
+      }
+
+      $this->_rows = array();
+
+      // Fetch the rows.
+      foreach (new LimitIterator($this->_file, $rowOffset) as $key => $row) {
+        // Apply any filters.
+        $this->_rows[$key] = $this->_applyFilters($row);
+      }
+
+      // Flush the filters.
+      $this->flushFilters();
+
+      // We won't need the file anymore.
+      unset($this->_file);
+    } else if (empty($this->_filters)) {
+      // Nothing to do here.
+      // We return now to avoid triggering garbage collection.
+      return $this;
     }
 
-    // Loop through the CSV rows.
-    foreach(new LimitIterator($this->_file, $rowOffset) as $key => $row) {
+    if (!empty($this->_filters)) {
+      // Apply our filters.
+      $this->_rows = array_map(
+        array($this, '_applyFilters'),
+        $this->_rows
+      );
+
+      // Flush the filters.
+      $this->flushFilters();
+    }
+
+    // Do some garbage collection to free memory of garbage we won't use.
+    // @see http://php.net/manual/en/function.gc-collect-cycles.php
+    gc_collect_cycles();
+
+    return $this;
+  }
+
+  /**
+   * Flushes all active filters.
+   *
+   * @return CSV $this
+   */
+  public function flushFilters() {
+    $this->_filters = array();
+    return $this;
+  }
+
+  /**
+   * Apply filters to the given row.
+   *
+   * @param array $row
+   * @return array $row
+   */
+  public function _applyFilters(array $row) {
+    if (!empty($this->_filters)) {
       // Run filters in the same order they were registered.
       foreach ($this->_filters as &$filter) {
         $callable =& $filter['callable'];
@@ -228,15 +287,9 @@ class CSV implements IteratorAggregate {
 
       // Unset references.
       unset($filter, $callable, $column);
-
-      // Do some garbage collection to free memory of garbage we won't use.
-      // @see http://php.net/manual/en/function.gc-collect-cycles.php
-      gc_collect_cycles();
-
-      $this->_rows[$key] = $row;
     }
 
-    return $this;
+    return $row;
   }
 
   /**
@@ -247,6 +300,8 @@ class CSV implements IteratorAggregate {
    * @return ArrayIterator
    */
   public function getIterator() {
+    if (!isset($this->_rows)) $this->parse();
+
     return new ArrayIterator($this->_rows);
   }
 
@@ -257,16 +312,17 @@ class CSV implements IteratorAggregate {
    * @return string $output HTML table of CSV contents
    */
   public function toTable() {
-    $num_rows = count($this);
+    $output = '';
 
-    // Begin table.
-    $output = '<table border="1" cellspacing="1" cellpadding="3">';
+    if (!isset($this->_rows)) $this->parse();
 
-    if ($num_rows) {
+    if (!empty($this->_rows)) {
+      // Begin table.
+      $output = '<table border="1" cellspacing="1" cellpadding="3">';
 
       // Table head.
       $output .= '<thead><tr><th>&nbsp;</th>';
-      foreach ($this as $row) {
+      foreach ($this->_rows as $row) {
         foreach ($row as $key => $col) {
           $output .= '<th>' . $key .  '</th>';
         }
@@ -276,7 +332,7 @@ class CSV implements IteratorAggregate {
 
       // Table body.
       $output .= '<tbody>';
-      foreach ($this as $i => $row) {
+      foreach ($this->_rows as $i => $row) {
         $output .= '<tr>';
         $output .= '<th>' . $i . '</th>';
         foreach ($row as $col) {
@@ -285,10 +341,10 @@ class CSV implements IteratorAggregate {
         $output .= '</tr>';
       }
       $output .= '</tbody>';
-    }
 
-    // Close table.
-    $output .= '</table>';
+      // Close table.
+      $output .= '</table>';
+    }
 
     return $output;
   }
@@ -299,6 +355,8 @@ class CSV implements IteratorAggregate {
    * @return string JSON encoded string
    */
   public function toJSON() {
+    if (!isset($this->_rows)) $this->parse();
+
     return json_encode($this->_rows);
   }
 
