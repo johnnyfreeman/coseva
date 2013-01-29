@@ -11,6 +11,12 @@
             "email": "hello@johnnyfreeman.us",
             "homepage": "http://johnnyfreeman.us",
             "role": "Developer"
+        },
+        {
+            "name": "Jan-Marten de Boer",
+            "email": "github@johmanx.com",
+            "homepage": "https://github.com/johmanx10",
+            "role": "Developer"
         }
     ],
     "require": {
