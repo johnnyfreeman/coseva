@@ -6,7 +6,7 @@
  * @subpackage Examples
  */
 
-require_once '../src/CSV.php';
+require_once '../src/Coseva/CSV.php';
 use \Coseva\CSV;
 
 // Get an instance of CSV.

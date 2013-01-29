@@ -9,7 +9,7 @@
  * @subpackage Examples
  */
 
-require_once '../src/CSV.php';
+require_once '../src/Coseva/CSV.php';
 use \Coseva\CSV;
 
 // We use a 103.2 MB CSV file for testing.

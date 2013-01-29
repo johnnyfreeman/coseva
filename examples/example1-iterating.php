@@ -1,7 +1,7 @@
 <?php
 
 // load
-require('../src/CSV.php');
+require('../src/Coseva/CSV.php');
 
 // read
 $csv = new Coseva\CSV('example1.csv');
