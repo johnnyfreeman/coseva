@@ -254,10 +254,11 @@ class CSV implements IteratorAggregate {
   /**
    * Flushes all active filters.
    *
-   * @return void
+   * @return CSV $this
    */
   public function flushFilters() {
     $this->_filters = array();
+    return $this;
   }
 
   /**
