@@ -322,7 +322,7 @@ class CSV implements IteratorAggregate {
 
       // Table head.
       $output .= '<thead><tr><th>&nbsp;</th>';
-      foreach ($this as $row) {
+      foreach ($this->_rows as $row) {
         foreach ($row as $key => $col) {
           $output .= '<th>' . $key .  '</th>';
         }
@@ -332,7 +332,7 @@ class CSV implements IteratorAggregate {
 
       // Table body.
       $output .= '<tbody>';
-      foreach ($this as $i => $row) {
+      foreach ($this->_rows as $i => $row) {
         $output .= '<tr>';
         $output .= '<th>' . $i . '</th>';
         foreach ($row as $col) {
