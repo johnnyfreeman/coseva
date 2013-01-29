@@ -219,7 +219,7 @@ class CSV implements IteratorAggregate {
       // Fetch the rows.
       foreach (new LimitIterator($this->_file, $rowOffset) as $key => $row) {
         // Apply any filters.
-        $this->row[$key] = $this->_applyFilters($row);
+        $this->_rows[$key] = $this->_applyFilters($row);
       }
 
       // Flush the filters.
