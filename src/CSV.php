@@ -233,14 +233,16 @@ class CSV implements IteratorAggregate {
       return $this;
     }
 
-    // Apply our filters.
-    $this->_rows = array_map(
-      array($this, '_applyFilters'),
-      $this->_rows
-    );
+    if (!empty($this->_filters)) {
+      // Apply our filters.
+      $this->_rows = array_map(
+        array($this, '_applyFilters'),
+        $this->_rows
+      );
 
-    // Flush the filters.
-    $this->flushFilters();
+      // Flush the filters.
+      $this->flushFilters();
+    }
 
     // Do some garbage collection to free memory of garbage we won't use.
     // @see http://php.net/manual/en/function.gc-collect-cycles.php
