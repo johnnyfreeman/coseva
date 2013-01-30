@@ -122,7 +122,7 @@ class CSV implements IteratorAggregate {
         $path = realpath($filename);
 
         if (!$path) throw new InvalidArgumentException(
-            'The fiven filename could not be resolved. Tried resolving '
+            'The given filename could not be resolved. Tried resolving '
             . var_export($filename, true)
         );
 
