@@ -1,13 +1,13 @@
-    <?php
+<?php
 
-    // load
-    require '../src/Coseva/CSV.php';
+// load
+require '../src/Coseva/CSV.php';
 
-    // read
-    $csv = new Coseva\CSV('example1.csv');
+// read
+$csv = new Coseva\CSV('example1.csv');
 
-    // parse
-    $csv->parse();
+// parse
+$csv->parse();
 
-    // disco
-    echo $csv->toJSON();
+// disco
+echo $csv->toJSON();
