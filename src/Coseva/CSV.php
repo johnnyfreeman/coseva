@@ -117,7 +117,7 @@ class CSV implements IteratorAggregate {
      *   not be resolved.
      * @return CSV self::$_instances[$filename]
      */
-    public static function getInstance($filename) {
+    public static function getInstance($filename, $open_mode = 'r', $use_include_path = false) {
         // Resolve the path, so there is a better likelihood of finding a match.
         $path = realpath($filename);
 
@@ -134,7 +134,7 @@ class CSV implements IteratorAggregate {
             $class = __CLASS__;
 
             // Create a new instance of this class.
-            self::$_instances[$filename] = new $class($filename);
+            self::$_instances[$filename] = new $class($filename, $open_mode, $use_include_path);
         }
 
         return self::$_instances[$filename];
