@@ -1,7 +1,7 @@
 <?php
 
 // load
-require('../src/Coseva/CSV.php');
+require '../src/Coseva/CSV.php';
 
 // read
 $csv = new Coseva\CSV('example1.csv');
@@ -11,5 +11,5 @@ $csv->parse();
 
 // disco
 foreach ($csv as $row) {
-	// persist row to datastore or something
+    // persist row to datastore or something
 }

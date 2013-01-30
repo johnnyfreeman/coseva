@@ -65,7 +65,6 @@ $end = microtime(true);
 echo 'Round #3: Parsing took '
   . number_format(($end - $start) * 1000, 2) . ' ms' . PHP_EOL;
 
-
 // Test results on development workstation:
 // Round #1: Parsing took 18,095.08 ms
 // Round #2: Parsing took 180.32 ms

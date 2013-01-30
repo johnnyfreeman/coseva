@@ -21,8 +21,8 @@ use \InvalidArgumentException;
 /**
  * CSV.
  */
-class CSV implements IteratorAggregate {
-
+class CSV implements IteratorAggregate
+{
     /**
      * Storage for parsed CSV rows.
      *
@@ -73,15 +73,16 @@ class CSV implements IteratorAggregate {
      *
      * To read a csv file, just pass the path to the .csv file.
      *
-     * @param string $filename The file to read. Should be readable.
-     * @param string $open_mode The mode in which to open the file
+     * @param string  $filename         The file to read. Should be readable.
+     * @param string  $open_mode        The mode in which to open the file
      * @param boolean $use_include_path Whether to search through include_path
      * @see http://php.net/manual/en/function.fopen.php for a list of modes
      * @throws InvalidArgumentException when the given file could not be read
      * @throws InvalidArgumentException when the given open mode does not exist
-     * @return CSV $this
+     * @return CSV                      $this
      */
-    function __construct($filename, $open_mode = 'r', $use_include_path = false) {
+    public function __construct($filename, $open_mode = 'r', $use_include_path = false)
+    {
         // Check if the given filename was readable.
         if (!is_readable($filename)) throw new InvalidArgumentException(
             var_export($filename, true) . ' is not readable.'
@@ -117,7 +118,8 @@ class CSV implements IteratorAggregate {
      *   not be resolved.
      * @return CSV self::$_instances[$filename]
      */
-    public static function getInstance($filename, $open_mode = 'r', $use_include_path = false) {
+    public static function getInstance($filename, $open_mode = 'r', $use_include_path = false)
+    {
         // Resolve the path, so there is a better likelihood of finding a match.
         $path = realpath($filename);
 
@@ -155,9 +157,10 @@ class CSV implements IteratorAggregate {
      *  and return the new value, like trim, htmlspecialchars, urlencode, etc.
      * @throws InvalidArgumentException when no valid callable was given
      * @throws InvalidArgumentException when no proper column index was supplied
-     * @return CSV $this
+     * @return CSV                      $this
      */
-    public function filter($column, $callable = null) {
+    public function filter($column, $callable = null)
+    {
         // Check the function arguments.
         if (!empty($callable)) {
             if (!is_callable($callable)) throw new InvalidArgumentException(
@@ -197,7 +200,8 @@ class CSV implements IteratorAggregate {
      *   offsets, to prevent resultsets from interfering.
      * @return CSV $this
      */
-    public function parse($rowOffset = 0) {
+    public function parse($rowOffset = 0)
+    {
         // Cast the row offset as an integer.
         $rowOffset = (int) $rowOffset;
 
@@ -227,7 +231,7 @@ class CSV implements IteratorAggregate {
 
             // We won't need the file anymore.
             unset($this->_file);
-        } else if (empty($this->_filters)) {
+        } elseif (empty($this->_filters)) {
             // Nothing to do here.
             // We return now to avoid triggering garbage collection.
             return $this;
@@ -256,18 +260,21 @@ class CSV implements IteratorAggregate {
      *
      * @return CSV $this
      */
-    public function flushFilters() {
+    public function flushFilters()
+    {
         $this->_filters = array();
+
         return $this;
     }
 
     /**
      * Apply filters to the given row.
      *
-     * @param array $row
+     * @param  array $row
      * @return array $row
      */
-    public function _applyFilters(array $row) {
+    public function _applyFilters(array $row)
+    {
         if (!empty($this->_filters)) {
             // Run filters in the same order they were registered.
             foreach ($this->_filters as &$filter) {
@@ -299,9 +306,9 @@ class CSV implements IteratorAggregate {
      *
      * @return ArrayIterator
      */
-    public function getIterator() {
+    public function getIterator()
+    {
         if (!isset($this->_rows)) $this->parse();
-
         return new ArrayIterator($this->_rows);
     }
 
@@ -311,7 +318,8 @@ class CSV implements IteratorAggregate {
      *
      * @return string $output HTML table of CSV contents
      */
-    public function toTable() {
+    public function toTable()
+    {
         $output = '';
 
         if (!isset($this->_rows)) $this->parse();
@@ -354,9 +362,9 @@ class CSV implements IteratorAggregate {
      *
      * @return string JSON encoded string
      */
-    public function toJSON() {
+    public function toJSON()
+    {
         if (!isset($this->_rows)) $this->parse();
-
         return json_encode($this->_rows);
     }
 
@@ -366,7 +374,8 @@ class CSV implements IteratorAggregate {
      *
      * @return string $this->toTable() HTML table of CSV contents
      */
-    public function __toString() {
+    public function __toString()
+    {
         return $this->toTable();
     }
 
