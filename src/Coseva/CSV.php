@@ -84,9 +84,11 @@ class CSV implements IteratorAggregate
     public function __construct($filename, $open_mode = 'r', $use_include_path = false)
     {
         // Check if the given filename was readable.
-        if (!is_readable($filename)) throw new InvalidArgumentException(
-            var_export($filename, true) . ' is not readable.'
-        );
+        if (!$this->_resolveFilename($filename, $use_include_path)) {
+            throw new InvalidArgumentException(
+                var_export($filename, true) . ' is not readable.'
+            );
+        }
 
         // Check if the given open mode was valid.
         if (!in_array($open_mode, self::$_availableOpenModes)) {
@@ -107,39 +109,66 @@ class CSV implements IteratorAggregate
     /**
      * Get an instance of CSV, based on the filename.
      *
-     * Note: Because PHP's integer type is signed and many platforms use 32bit
-     * integers, some filesystem functions may return unexpected results for
-     * files which are larger than 2GB.
-     *
      * @param string $filename the CSV file to read. Should be readable.
      *   Filenames will be resolved. Symlinks will be followed.
-     * @see http://php.net/manual/en/function.realpath.php
-     * @throws InvalidArgumentException if the absolute path of the file could
-     *   not be resolved.
-     * @return CSV self::$_instances[$filename]
+     * @return CSV self::$_instances[$key]
      */
     public static function getInstance($filename, $open_mode = 'r', $use_include_path = false)
     {
-        // Resolve the path, so there is a better likelihood of finding a match.
-        $path = realpath($filename);
-
-        if (!$path) throw new InvalidArgumentException(
-            'The given filename could not be resolved. Tried resolving '
-            . var_export($filename, true)
-        );
-
-        $filename = $path;
+        // Create a combined key so different open modes can get their own instance.
+        $key = $open_mode . ':' . $filename;
 
         // Check if an instance exists. If not, create one.
-        if (!isset(self::$_instances[$filename])) {
+        if (!isset(self::$_instances[$key])) {
             // Collect the class name. This won't break when the class name changes.
             $class = __CLASS__;
 
             // Create a new instance of this class.
-            self::$_instances[$filename] = new $class($filename, $open_mode, $use_include_path);
+            self::$_instances[$key] = new $class($filename, $open_mode, $use_include_path);
         }
 
-        return self::$_instances[$filename];
+        return self::$_instances[$key];
+    }
+
+    /**
+     * Resolve a given filename, keeping include paths in mind.
+     *
+     * Note: Because PHP's integer type is signed and many platforms use 32bit
+     * integers, some filesystem functions may return unexpected results for
+     * files which are larger than 2GB.
+     *
+     * @param string &$filename the file to resolve.
+     * @param boolean $use_include_path whether or not to use the PHP include path.
+     *   If set to true, the PHP include path will be used to look for the given
+     *   filename. Only if the filename is using a relative path.
+     * @see http://php.net/manual/en/function.realpath.php
+     * @return boolean true|false to indicate whether the resolving succeeded.
+     */
+    private function _resolveFilename(&$filename, $use_include_path = false)
+    {
+        $exists = file_exists($filename);
+
+        // The given filename did not suffice. Let's do a deeper check.
+        if (!$exists && $use_include_path && substr($filename, 0, 1) !== '/') {
+            // Gather the include paths.
+            $paths = explode(':', get_include_path());
+
+            // Walk through the include paths.
+            foreach ($paths as $path) {
+                // Check if the file exists within this path.
+                $exists = realpath($path . '/' . $filename);
+
+                // It didn't work. Move along.
+                if (!$exists) continue;
+
+                // It actually did work. Now overwrite my filename.
+                $filename = $exists;
+                $exists = true;
+                break;
+            }
+        }
+
+        return $exists && is_readable($filename);
     }
 
     /**
