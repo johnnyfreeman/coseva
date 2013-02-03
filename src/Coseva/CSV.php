@@ -190,30 +190,36 @@ class CSV implements IteratorAggregate
      */
     public function filter($column, $callable = null)
     {
-        // Check the function arguments.
-        if (!empty($callable)) {
-            if (!is_callable($callable)) throw new InvalidArgumentException(
-                'The $callable parameter must be callable.'
-            );
+        // Get the function arguments.
+        $args = func_get_args();
+        $column = array_shift($args);
 
-            if (!is_numeric($column)) throw new InvalidArgumentException(
-                'No proper column index provided. Expected a numeric, while given '
-                . var_export($column, true)
-            );
+        // Check if we actually have a column or a callable.
+        if (is_numeric($column)) {
+            $callable = array_shift($args);
+        } else {
+            $callable = $column;
+            $column = null;
         }
+
+        // Check the function arguments.
+        if (!is_callable($callable)) throw new InvalidArgumentException(
+            'The $callable parameter must be callable.'
+        );
+
+        if (isset($column) && !is_numeric($column)) throw new InvalidArgumentException(
+            'No proper column index provided. Expected a numeric, while given '
+            . var_export($column, true)
+        );
 
         // Add the filter to our stack. Apply it to the whole row when our column
         // appears to be the callable, being the only present argument.
-        $this->_filters[] = is_callable($column)
-            ? array(
-                'callable' => $column,
-                'column' => null
-            )
-            : array(
-                'callable' => $callable,
-                // Explicitely cast the column as an integer.
-                'column' => (int) $column
-            );
+        $this->_filters[] = array(
+            'callable' => $callable,
+            // Explicitely cast the column as an integer.
+            'column' => isset($column) ? (int) $column : null,
+            'args' => $args
+        );
 
         return $this;
     }
@@ -309,20 +315,30 @@ class CSV implements IteratorAggregate
             foreach ($this->_filters as &$filter) {
                 $callable =& $filter['callable'];
                 $column =& $filter['column'];
+                $arguments =& $filter['args'];
 
                 // Apply to the entire row.
                 if (empty($column)) {
-                    $row = call_user_func_array($callable, array(&$row));
+                    $row = call_user_func_array(
+                        $callable,
+                        array_merge(
+                            array(&$row),
+                            $arguments
+                        )
+                    );
                 } else {
                     $row[$column] = call_user_func_array(
                         $callable,
-                        array(&$row[$column])
+                        array_merge(
+                            array(&$row[$column]),
+                            $arguments
+                        )
                     );
                 }
             }
 
             // Unset references.
-            unset($filter, $callable, $column);
+            unset($filter, $callable, $column, $arguments);
         }
 
         return $row;

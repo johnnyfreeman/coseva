@@ -119,7 +119,7 @@ Returns CSV instance.
 $csv = new CSV('path/to/file.csv');
 ```
 
-### filter( $column, $callable )
+### filter( $column, $callable[, mixed $argument1, ...] )
 
 This method allows you to register any number of filters on your CSV content. But there are two ways you can utilize this method.
 
@@ -132,6 +132,9 @@ The first method, you'll pass a column number and a callable, like so:
 
 	// trim the whitespace around column 1
 	$csv->filter(0, 'trim');
+
+	// Format a numeric column to always display 2 decimals.
+	$csv->filter(1, 'number_format', 2);
 
 The second method, you'll pass only a callback, like so:
 
