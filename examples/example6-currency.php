@@ -1,6 +1,6 @@
 <?php
 /**
- * COnverting currency on-the-fly with Coseva.
+ * Converting currency on-the-fly with Coseva.
  *
  * @package Coseva
  * @subpackage Examples
