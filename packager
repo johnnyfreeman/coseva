@@ -7,7 +7,7 @@
  * When using suhosin, add suhosin.executor.include.whitelist="phar" to your
  * suhosin.ini file, normally stored at /etc/php5/conf.d/suhosin.ini.
  *
- * Usage: package source.csv script.php
+ * Usage: packager source.csv script.php [output.phar [alias.phar]]
  *
  * @package Coseva
  * @subpackage Packager

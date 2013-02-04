@@ -345,7 +345,7 @@ DESCRIPTION
 						The input file which holds the CSV data.
 
 			script.php
-						The PHP script which used Coseva to do filtering and parsing.
+						The PHP script which uses Coseva to do filtering and parsing.
 						It can make use of the automatically defined constant SOURCE_FILE
 						to succesfully target the CSV file for file operations.
 						Also, including / requiring Coseva is no longer needed, as the
