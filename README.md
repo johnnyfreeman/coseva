@@ -321,7 +321,7 @@ echo $dupe->toJSON();
 
 # Packaging / Standalone CSV parser
 
-For conveniences sake, we created a packager so you can combine your script and CSV in one compressed and executable bundle. We make use of the Phar technology that has been available since 5.3.0.
+For convenience's sake, we created a packager so you can combine your script and CSV in one compressed and executable bundle. We make use of the Phar technology that has been available since 5.3.0.
 
 The benefits are simple:
 
@@ -349,7 +349,7 @@ DESCRIPTION
 						It can make use of the automatically defined constant SOURCE_FILE
 						to succesfully target the CSV file for file operations.
 						Also, including / requiring Coseva is no longer needed, as the
-						package will do so for when bootstrapping.
+						package will do so when bootstrapping.
 
 			output.phar [optional]
 						The output location of the package.
