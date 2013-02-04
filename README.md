@@ -319,6 +319,55 @@ echo $dupe->toJSON();
 
 ```
 
+# Packaging / Standalone CSV parser
+
+For conveniences sake, we created a packager so you can combine your script and CSV in one compressed and executable bundle. We make use of the Phar technology that has been available since 5.3.0.
+
+The benefits are simple:
+
+- Only one file to keep around
+- Your data is compressed
+- You keep all your scripting functionality alongside your CSV file
+- No need for Coseva as an external library
+- PHP 5.2 and above are able to execute it
+
+###### Usage
+
+```
+NAME
+			packager - Combine Coseva, your script and CSV
+
+SYNOPSIS
+			packager input.csv script.php [output.phar [alias.phar]]
+
+DESCRIPTION
+			input.csv
+						The input file which holds the CSV data.
+
+			script.php
+						The PHP script which used Coseva to do filtering and parsing.
+						It can make use of the automatically defined constant SOURCE_FILE
+						to succesfully target the CSV file for file operations.
+						Also, including / requiring Coseva is no longer needed, as the
+						package will do so for when bootstrapping.
+
+			output.phar [optional]
+						The output location of the package.
+
+			alias.phar [optional]
+						The internal alias of the package. Really useful when wanting to
+						target the package from within your script.
+						E.g. "phar://alias.phar/input.csv"
+```
+
+###### Configuration
+
+packager should be able to run as it is. On some machines, certain flags may have to be set.
+No worries, though. Packager will automatically detect which of these flags need to be set and where you can find them.
+
+On most machines, setting `phar.readonly = Off` will suffice. For machines running suhosin, there is an instruction for
+adding "phar" to the executor whitelist of suhosin when needed.
+
 # Updates
 
 Want to stay updated? Follow me on [Github](https://github.com/johnnyfreeman) and [Twitter](http://twitter.com/prsjohnny).
