@@ -2,6 +2,9 @@
 /**
  * Example of a package file.
  *
+ * To create the corresponding package, simply run:
+ * ./package examples/example6.csv examples/example7-phar.php
+ *
  * @package Coseva
  * @subpackage Examples
  */
