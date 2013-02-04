@@ -119,7 +119,7 @@ Returns CSV instance.
 $csv = new CSV('path/to/file.csv');
 ```
 
-### filter( $column, $callable )
+### filter( $column, $callable[, mixed $argument1, ...] )
 
 This method allows you to register any number of filters on your CSV content. But there are two ways you can utilize this method.
 
@@ -132,6 +132,9 @@ The first method, you'll pass a column number and a callable, like so:
 
 	// trim the whitespace around column 1
 	$csv->filter(0, 'trim');
+
+	// Format a numeric column to always display 2 decimals.
+	$csv->filter(1, 'number_format', 2);
 
 The second method, you'll pass only a callback, like so:
 
@@ -262,7 +265,7 @@ Returns an HTML `String`.
 echo $csv->toTable();
 ```
 
-### getInstance( $filename )
+### getInstance( $filename, $open_mode = 'r', $use_include_path = false )
 
 We also allow for instances, preserving memory and maintaining reachability across scopes.
 
@@ -281,6 +284,16 @@ We also allow for instances, preserving memory and maintaining reachability acro
 	        <th>$filename</th>
 	        <td><a href="http://www.php.net/manual/en/language.types.string.php">String</a></td>
 	        <td>A readable filename to reference the instances by. The filename will be resolved to the absolute path, following symlinks, to improve chances of finding a matching instance.</td>
+	    </tr>
+	    <tr>
+	        <th>$open_mode</th>
+	        <td><a href="http://www.php.net/manual/en/language.types.string.php">String</a></td>
+	        <td>The mode in which to open the file. See <a href="http://php.net/manual/en/function.fopen.php">fopen()</a> for a list of allowed modes.</td>
+	    </tr>
+      <tr>
+	        <th>$use_include_path</th>
+	        <td><a href="http://www.php.net/manual/en/language.types.boolean.php">Boolean</a></td>
+	        <td>Whether to search in the <a href="http://php.net/manual/en/ini.core.php#ini.include-path">include_path</a> for filename.</td>
 	    </tr>
 	</tbody>
 </table>
@@ -305,6 +318,55 @@ $csv->parse();
 echo $dupe->toJSON();
 
 ```
+
+# Packaging / Standalone CSV parser
+
+For convenience's sake, we created a packager so you can combine your script and CSV in one compressed and executable bundle. We make use of the Phar technology that has been available since 5.3.0.
+
+The benefits are simple:
+
+- Only one file to keep around
+- Your data is compressed
+- You keep all your scripting functionality alongside your CSV file
+- No need for Coseva as an external library
+- PHP 5.2 and above are able to execute it
+
+###### Usage
+
+```
+NAME
+			packager - Combine Coseva, your script and CSV
+
+SYNOPSIS
+			packager input.csv script.php [output.phar [alias.phar]]
+
+DESCRIPTION
+			input.csv
+						The input file which holds the CSV data.
+
+			script.php
+						The PHP script which uses Coseva to do filtering and parsing.
+						It can make use of the automatically defined constant SOURCE_FILE
+						to succesfully target the CSV file for file operations.
+						Also, including / requiring Coseva is no longer needed, as the
+						package will do so when bootstrapping.
+
+			output.phar [optional]
+						The output location of the package.
+
+			alias.phar [optional]
+						The internal alias of the package. Really useful when wanting to
+						target the package from within your script.
+						E.g. "phar://alias.phar/input.csv"
+```
+
+###### Configuration
+
+packager should be able to run as it is. On some machines, certain flags may have to be set.
+No worries, though. Packager will automatically detect which of these flags need to be set and where you can find them.
+
+On most machines, setting `phar.readonly = Off` will suffice. For machines running suhosin, there is an instruction for
+adding "phar" to the executor whitelist of suhosin when needed.
 
 # Updates
 
