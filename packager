@@ -1,0 +1,192 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Create standalone PHP archives with Coseva's parser.
+ *
+ * Note: in php.ini you need to have phar.readonly = 1
+ * When using suhosin, add suhosin.executor.include.whitelist="phar" to your
+ * suhosin.ini file, normally stored at /etc/php5/conf.d/suhosin.ini.
+ *
+ * Usage: packager source.csv script.php [output.phar [alias.phar]]
+ *
+ * @package Coseva
+ * @subpackage Packager
+ */
+
+define('LINE_FEED', "\n================================================================================\n");
+
+echo 'Load dependencies. . . ';
+
+use \Phar;
+
+echo '[OK]' . PHP_EOL;
+
+echo 'Check Phar capabilities . . . ';
+
+// Make sure we can actually create archives.
+if (!Phar::canWrite()) {
+  $pharReadOnly = ini_get('phar.readonly') . '';
+  $suhosinWhitelist = ini_get('suhosin.executor.include.whitelist');
+
+  $instructions = '';
+
+  // Instruct to set the phar readonly mode to off.
+  if ($pharReadOnly !== '0') {
+    $instructions .= PHP_EOL . "  " . '- Set phar.readonly = 0 in "'
+      . php_ini_loaded_file() . '"';
+  }
+
+  // Instruct to add phar to the suhosin whitelist.
+  if (extension_loaded('suhosin')
+      && strpos($suhosinWhiteList, 'phar') === false
+  ) {
+    $instructions .= PHP_EOL . "  " . '- Add "phar" to '
+      . 'suhosin.executor.include.whitelist';
+
+    // Find the suhosin ini file. This is going to be a rather probable match.
+    $scannedIniFiles = explode(',', php_ini_scanned_files());
+
+    if (count($scannedIniFiles)) {
+      foreach ($scannedIniFiles as $file) {
+        // Found the file.
+        if (substr($file, -11) === 'suhosin.ini') {
+          $instructions .= ' in "' . $file . '"';
+          break;
+        }
+      }
+    }
+  }
+
+  die(
+    'Your system is not set up to create Phar files. This is normal for '
+    . 'production environments.' . $instructions
+  );
+}
+
+echo '[OK]' . PHP_EOL;
+
+echo 'Checking CLI arguments. . . ';
+
+// Must at least have arguments.
+if (empty($_SERVER['argv'])) die('No arguments given!');
+
+// The Coseva library.
+$library = dirname(__FILE__) . '/src/Coseva/CSV.php';
+
+if (!is_readable($library)) die(
+  'Could not read the Coseva library file. Expected to be found at: "'
+  . $library . '"'
+);
+
+// The CLI arguments.
+$arguments = $_SERVER['argv'];
+
+// The first argument is always the script path.
+$self = array_shift($arguments);
+
+// Check if we still have enought arguments.
+if (count($arguments) < 2) die(
+  'Lacking arguments. Expecting the following two: source.csv script.php'
+);
+
+// The CSV file.
+$source = realpath(array_shift($arguments));
+
+if (!$source || !is_readable($source)) die(
+  'Invalid source file supplied.'
+);
+
+// The wrapping script.
+$script = realpath(array_shift($arguments));
+
+if (!$script || !is_readable($script)) die(
+  'Invalid script file supplied.'
+);
+
+$output = count($arguments) > 0
+  ? array_shift($arguments)
+  : dirname(__FILE__) . '/package.phar';
+
+$alias = count($arguments) > 0
+  ? array_shift($arguments)
+  : pathinfo($output, PATHINFO_FILENAME) . '.'
+    . pathinfo($output, PATHINFO_EXTENSION);
+
+$sourceAlias = pathinfo($source, PATHINFO_FILENAME) . '.'
+  . pathinfo($source, PATHINFO_EXTENSION);
+
+$scriptAlias = pathinfo($script, PATHINFO_FILENAME) . '.'
+  . pathinfo($script, PATHINFO_EXTENSION);
+
+echo '[OK]' . PHP_EOL;
+echo LINE_FEED;
+
+echo 'Library:' . "\t" . $library . PHP_EOL;
+echo 'Output:' . "\t\t" . $output . PHP_EOL;
+echo 'Alias:' . "\t\t" . $alias . PHP_EOL;
+echo 'Source:' . "\t\t" . $source . ' [phar://'
+ . $alias . '/' . $sourceAlias . ']' . PHP_EOL;
+echo 'Script:' . "\t\t" . $script . ' [phar://'
+ . $alias . '/' . $scriptAlias . ']';
+echo LINE_FEED;
+
+echo '[NOTE] You can use PHP constant SOURCE_FILE to access the CSV file.';
+
+echo LINE_FEED;
+
+echo 'Creating new executable. . . ';
+$phar = new Phar($output, 0, $alias);
+$phar->convertToExecutable(Phar::TAR, Phar::GZ);
+echo '[OK]' . PHP_EOL;
+
+echo 'Start buffering. . . ';
+$phar->startBuffering();
+echo '[OK]' . PHP_EOL;
+
+echo 'Adding CSV source. . . ';
+$phar[$sourceAlias] = file_get_contents($source);
+echo '[OK]' . PHP_EOL;
+
+echo 'Adding script file. . . ';
+$phar[$scriptAlias] = file_get_contents($script);
+echo '[OK]' . PHP_EOL;
+
+echo 'Adding Coseva library file. . . ';
+$phar['Coseva/CSV.php'] = file_get_contents($library);
+echo '[OK]' . PHP_EOL;
+
+if (Phar::canCompress(Phar::GZ)) {
+  echo 'Detected GZ compression. . . ' . PHP_EOL;
+
+  echo 'Compressing CSV file. . . ';
+  $phar[$sourceAlias]->compress(Phar::GZ);
+  echo '[OK]' . PHP_EOL;
+
+  echo 'Compressing Script. . . ';
+  $phar[$scriptAlias]->compress(Phar::GZ);
+  echo '[OK]' . PHP_EOL;
+}
+
+echo 'Setting bootstrap file to ' . $scriptAlias . '. . . ';
+$phar->setMetadata(array('bootstrap' => $scriptAlias));
+echo '[OK]' . PHP_EOL;
+
+echo 'Setting Phar stub, to initialize Coseva. . . ';
+
+// Create a stub that included the library, sets the source file and loads the
+// given script.
+$stub = '<?php Phar::interceptFileFuncs();'
+  . PHP_EOL . 'include_once \'phar://' . $alias . '/Coseva/CSV.php\';'
+  . PHP_EOL . 'define(\'SOURCE_FILE\', \'phar://' . $alias . '/' . $sourceAlias
+  . '\');' . PHP_EOL . 'include \'phar://' . $alias . '/' . $scriptAlias . '\';'
+  . PHP_EOL . '__HALT_COMPILER();';
+
+$phar->setStub($stub);
+echo '[OK]' . PHP_EOL;
+
+echo 'Saving archive to ' . $output . '. . . ';
+$phar->stopBuffering();
+echo '[OK]' . PHP_EOL;
+
+echo LINE_FEED;
+echo 'DONE!!!' . PHP_EOL;
