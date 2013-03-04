@@ -69,6 +69,13 @@ class CSV implements IteratorAggregate
     protected $_flushOnAfterFilter = false;
 
     /**
+     * Whether or not to do garbage collection after parsing.
+     *
+     * @var bool $_garbageCollection
+     */
+    protected $_garbageCollection = true;
+
+    /**
      * An array of instances of CSV to prevent unnecessary parsing of CSV files.
      *
      * @var array $_instances A list of CSV instances, keyed by filename
@@ -111,6 +118,22 @@ class CSV implements IteratorAggregate
             // Explicitely cast this as a boolean to ensure proper bevahior.
             'use_include_path' => (bool) $use_include_path
         );
+
+        // Try to automatically determine the most optimal settings for this file.
+        // First we clear the stat cache to have a better prediction.
+        clearstatcache(false, $filename);
+
+        $fsize = filesize($filename);
+        $malloc = memory_get_usage();
+        $mlimit = (int) ini_get('memory_limit');
+
+        // We have memory to spare. Make use of that.
+        if ($mlimit < 0 || $mlimit - $malloc > $fsize * 2) {
+            $this->_garbageCollection = false;
+        }
+
+        // If the file is large, flush empty rows to improve filter speed.
+        if ($fsize > 1e6) $this->_flushOnAfterFilter = true;
     }
 
     /**
@@ -266,11 +289,13 @@ class CSV implements IteratorAggregate
      *
      * @param mixed $row the row to flush
      * @param mixed $index the index of the row
+     * @param bool $trim whether or not to trim the data.
+     * @return void
      */
-    private function _flushEmptyRow($row, $index)
+    private function _flushEmptyRow($row, $index, $trim = false)
     {
         // If the row is scalar, let's trim it first.
-        if (is_scalar($row)) $row = trim($row);
+        if ($trim && is_scalar($row)) $row = trim($row);
 
         // Remove any rows that appear empty.
         if (empty($row)) unset($this->_rows[$index], $row, $index);
@@ -314,7 +339,7 @@ class CSV implements IteratorAggregate
 
                 // Flush empty rows.
                 if ($this->_flushOnAfterFilter) {
-                    $this->_flushEmptyRow($row, $key);
+                    $this->_flushEmptyRow($row, $key, true);
                 }
             }
 
@@ -330,14 +355,26 @@ class CSV implements IteratorAggregate
         }
 
         if (!empty($this->_filters)) {
-            // Apply our filters.
-            $this->_rows = array_map(
-                array($this, '_applyFilters'),
-                $this->_rows
-            );
+            // We explicitely divide the strategies here, since checking this
+            // after applying filters on every row makes for a double iteration
+            // through $this->flushEmptyRows().
+            // We therefore do this while iterating, but array_map cannot supply
+            // us with a proper index and therefore the flush would be delayed.
+            if ($this->_flushOnAfterFilter) {
+                foreach ($this->_rows as $index => &$row) {
+                    // Apply the filters.
+                    $row = $this->_applyFilters($row);
 
-            // Flush empty rows.
-            if ($this->_flushOnAfterFilter) $this->flushEmptyRows();
+                    // Flush it if it's empty.
+                    $this->_flushEmptyRow($row, $index);
+                }
+            } else {
+                // Apply our filters.
+                $this->_rows = array_map(
+                    array($this, '_applyFilters'),
+                    $this->_rows
+                );
+            }
 
             // Flush the filters.
             $this->flushFilters();
@@ -345,8 +382,19 @@ class CSV implements IteratorAggregate
 
         // Do some garbage collection to free memory of garbage we won't use.
         // @see http://php.net/manual/en/function.gc-collect-cycles.php
-        gc_collect_cycles();
+        if ($this->_garbageCollection) gc_collect_cycles();
 
+        return $this;
+    }
+
+    /**
+     * Whether or not to use garbage collection after parsing.
+     *
+     * @param bool $collect
+     * @return CSV $this
+     */
+    public function collectGarbage($collect = true) {
+        $this->_garbageCollection = (bool) $collect;
         return $this;
     }
 
@@ -358,7 +406,6 @@ class CSV implements IteratorAggregate
     public function flushFilters()
     {
         $this->_filters = array();
-
         return $this;
     }
 
