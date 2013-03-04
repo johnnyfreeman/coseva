@@ -12,11 +12,11 @@
 
 namespace Coseva;
 
-use \SplFileObject;
-use \LimitIterator;
-use \IteratorAggregate;
-use \ArrayIterator;
-use \InvalidArgumentException;
+use \SplFileObject,
+    \LimitIterator,
+    \IteratorAggregate,
+    \ArrayIterator,
+    \InvalidArgumentException;
 
 /**
  * CSV.
@@ -60,6 +60,13 @@ class CSV implements IteratorAggregate
     private static $_availableOpenModes = array(
         'r', 'r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+'
     );
+
+    /**
+     * Whether or not to flush empty rows after filtering.
+     *
+     * @var bool $_flushOnAfterFilter
+     */
+    protected $_flushOnAfterFilter = false;
 
     /**
      * An array of instances of CSV to prevent unnecessary parsing of CSV files.
@@ -225,6 +232,51 @@ class CSV implements IteratorAggregate
     }
 
     /**
+     * Flush rows that have turned out empty, either after applying filters or
+     * rows that simply have been empty in the source CSV from the get-go.
+     *
+     * @param boolean $onAfterFilter whether or not to trigger while parsing.
+     *   Leave this blank to trigger a flush right now.
+     * @return CSV $this
+     */
+    public function flushEmptyRows($onAfterFilter = null)
+    {
+        // Update the _flushOnParse flag and return.
+        if (!empty($onAfterFilter)) {
+            $this->_flushOnAfterFilter = (bool) $onAfterFilter;
+            return $this;
+        }
+
+        // Parse the CSV.
+        if (!isset($this->_rows)) $this->parse();
+
+        // Walk through the rows.
+        foreach ($this->_rows as $index => &$row) {
+            $this->_flushEmptyRow($row, $index);
+        }
+
+        // Remove garbage.
+        unset($row, $index);
+
+        return $this;
+    }
+
+    /**
+     * Flush a row if it's empty.
+     *
+     * @param mixed $row the row to flush
+     * @param mixed $index the index of the row
+     */
+    private function _flushEmptyRow($row, $index)
+    {
+        // If the row is scalar, let's trim it first.
+        if (is_scalar($row)) $row = trim($row);
+
+        // Remove any rows that appear empty.
+        if (empty($row)) unset($this->_rows[$index], $row, $index);
+    }
+
+    /**
      * This method will convert the csv to an array and will run all registered
      * filters against it.
      *
@@ -259,6 +311,11 @@ class CSV implements IteratorAggregate
             foreach (new LimitIterator($this->_file, $rowOffset) as $key => $row) {
                 // Apply any filters.
                 $this->_rows[$key] = $this->_applyFilters($row);
+
+                // Flush empty rows.
+                if ($this->_flushOnAfterFilter) {
+                    $this->_flushEmptyRow($row, $key);
+                }
             }
 
             // Flush the filters.
@@ -278,6 +335,9 @@ class CSV implements IteratorAggregate
                 array($this, '_applyFilters'),
                 $this->_rows
             );
+
+            // Flush empty rows.
+            if ($this->_flushOnAfterFilter) $this->flushEmptyRows();
 
             // Flush the filters.
             $this->flushFilters();
