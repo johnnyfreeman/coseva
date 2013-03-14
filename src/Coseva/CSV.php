@@ -264,7 +264,7 @@ class CSV implements IteratorAggregate
      */
     public function flushEmptyRows($onAfterFilter = null)
     {
-        // Update the _flushOnParse flag and return.
+        // Update the _flushOnAfterFilter flag and return.
         if (!empty($onAfterFilter)) {
             $this->_flushOnAfterFilter = (bool) $onAfterFilter;
             return $this;
