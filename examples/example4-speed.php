@@ -31,6 +31,17 @@ $testFilter = function(array $row) {
 // Get an instance of CSV.
 $csv = CSV::getInstance($testFile);
 
+// Set the flag to remove rows when empty.
+// Pro tip, this can actually speed up filters of the second iteration.
+// Especially on large data sets.
+// If Coseva finds your file to be large, it'll enable this by default.
+$csv->flushEmptyRows(true);
+
+// If you've got the memory to spare, disable garbage collection when using large
+// data sets, since garbage collection actually takes time.
+// If Coseva finds you have enough memory for it, it'll disable this by default.
+$csv->collectGarbage(false);
+
 // Get a duplicate reference.
 $dupe = CSV::getInstance($testFile);
 
