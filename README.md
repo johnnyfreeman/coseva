@@ -38,13 +38,13 @@ So if we were to register two filters like this:
 ```php
 <?php
 
-// trucate text in 1s column
+// delete 1st column
 $csv->filter(function($row) {
 	unset($row[0]);
 	return $row;
 });
 
-// Capitalize first letter of 1st column
+// Capitalize first letter of 1st column (which used to be the 2nd column)
 $csv->filter(0, function($col) {
     return ucfirst($col);
 });
@@ -125,30 +125,34 @@ This method allows you to register any number of filters on your CSV content. Bu
 
 The first method, you'll pass a column number and a callable, like so:
 
-	// convert data in column 2 to a `number` if it is numeric
-    $csv->filter(1, function($value) {
-    	return is_numeric($value) ? (float) $value : $value;
-	});
+```php
+// convert data in column 2 to a `number` if it is numeric
+$csv->filter(1, function($value) {
+	return is_numeric($value) ? (float) $value : $value;
+});
 
-	// trim the whitespace around column 1
-	$csv->filter(0, 'trim');
+// trim the whitespace around column 1
+$csv->filter(0, 'trim');
 
-	// Format a numeric column to always display 2 decimals.
-	$csv->filter(1, 'number_format', 2);
+// Format a numeric column to always display 2 decimals.
+$csv->filter(1, 'number_format', 2);
+```
 
 The second method, you'll pass only a callback, like so:
 
-	// overwrite column three based on values from columns 1 and 2
-	$csv->filter(function($row) {
-		if ($row[0] == 'this' && $row[1] == 'that') {
-			$row[2] = 'something';
-		}
+```php
+// overwrite column three based on values from columns 1 and 2
+$csv->filter(function($row) {
+	if ($row[0] == 'this' && $row[1] == 'that') {
+		$row[2] = 'something';
+	}
 
-		return $row;
-	});
+	return $row;
+});
 
-	// reverse the order of all columns
-	$csv->filter('array_reverse');
+// reverse the order of all columns
+$csv->filter('array_reverse');
+```
 
 ###### Parameters
 
