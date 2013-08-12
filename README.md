@@ -39,9 +39,9 @@ So if we were to register two filters like this:
 <?php
 
 // delete 1st column
-$csv->filter(function($column) {
-	unset($column[0]);
-	return $column;
+$csv->filter(function($columns) {
+	unset($columns[0]);
+	return $columns;
 });
 
 // Capitalize first letter of 1st column (which used to be the 2nd column)
@@ -142,12 +142,12 @@ The second method, you'll pass only a callback, like so:
 
 ```php
 // overwrite column three based on values from columns 1 and 2
-$csv->filter(function($column) {
-	if ($column[0] == 'this' && $column[1] == 'that') {
-		$column[2] = 'something';
+$csv->filter(function($columns) {
+	if ($columns[0] == 'this' && $columns[1] == 'that') {
+		$columns[2] = 'something';
 	}
 
-	return $column;
+	return $columns;
 });
 
 // reverse the order of all columns
@@ -193,9 +193,9 @@ $csv->filter(3, function($column4) {
 });
 
 // remove the first column from the results
-$csv->filter(function($column) {
-	unset($column[0]);
-    return $column;
+$csv->filter(function($columns) {
+	unset($columns[0]);
+    return $columns;
 });
 ```
 
