@@ -39,14 +39,14 @@ So if we were to register two filters like this:
 <?php
 
 // delete 1st column
-$csv->filter(function($row) {
-	unset($row[0]);
-	return $row;
+$csv->filter(function($columns) {
+	unset($columns[0]);
+	return $columns;
 });
 
 // Capitalize first letter of 1st column (which used to be the 2nd column)
-$csv->filter(0, function($col) {
-    return ucfirst($col);
+$csv->filter(0, function($column) {
+    return ucfirst($column);
 });
 ```
 
@@ -60,13 +60,13 @@ First, the first column will be deleted from the array, then during execution of
 $csv = new CSV('path/to/file.csv');
 
 // parse first column as date
-$csv->filter(0, function($col1) {
-    return (new DateTime($col1))->format('Y-m-d H:i:s');
+$csv->filter(0, function($column1) {
+    return (new DateTime($column1))->format('Y-m-d H:i:s');
 });
 
 // split column five at every colon and serialize
-$csv->filter(4, function($col5) {
-    return serialize(explode(':', $col5));
+$csv->filter(4, function($column5) {
+    return serialize(explode(':', $column5));
 });
 
 $csv->parse();
@@ -142,12 +142,12 @@ The second method, you'll pass only a callback, like so:
 
 ```php
 // overwrite column three based on values from columns 1 and 2
-$csv->filter(function($row) {
-	if ($row[0] == 'this' && $row[1] == 'that') {
-		$row[2] = 'something';
+$csv->filter(function($columns) {
+	if ($columns[0] == 'this' && $columns[1] == 'that') {
+		$columns[2] = 'something';
 	}
 
-	return $row;
+	return $columns;
 });
 
 // reverse the order of all columns
@@ -193,9 +193,9 @@ $csv->filter(3, function($column4) {
 });
 
 // remove the first column from the results
-$csv->filter(function($row) {
-	unset($row[0]);
-    return $row;
+$csv->filter(function($columns) {
+	unset($columns[0]);
+    return $columns;
 });
 ```
 
