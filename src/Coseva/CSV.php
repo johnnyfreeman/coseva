@@ -116,7 +116,9 @@ class CSV implements IteratorAggregate
             'filename' => $filename,
             'open_mode' => $open_mode,
             // Explicitely cast this as a boolean to ensure proper bevahior.
-            'use_include_path' => (bool) $use_include_path
+            'use_include_path' => (bool) $use_include_path,
+            // set comma as default delimiter
+            'delimiter' => ','
         );
 
         // Try to automatically determine the most optimal settings for this file.
@@ -328,6 +330,9 @@ class CSV implements IteratorAggregate
 
                 // Set the flag to parse CSV.
                 $this->_file->setFlags(SplFileObject::READ_CSV);
+
+                // Set the delimiter
+                $this->setDelimiter($this->_fileConfig['delimiter']);
             }
 
             $this->_rows = array();
@@ -449,6 +454,25 @@ class CSV implements IteratorAggregate
         }
 
         return $row;
+    }
+
+    /**
+     * Set a delimiter for the CSV file.
+     *
+     * @param string $delimiter
+     * @return object $this CSV instance
+     */
+    public function setDelimiter($delimiter)
+    {
+        $this->_fileConfig['delimiter'] = $delimiter;
+
+        // if the file has already been instantiated
+        // just set the dimiter immediately
+        if ($this->_file instanceof SplFileObject) {
+            $this->_file->setCsvControl($this->_fileConfig['delimiter']);
+        }
+
+        return $this;
     }
 
     /**
