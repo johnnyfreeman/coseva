@@ -430,7 +430,7 @@ class CSV implements IteratorAggregate
                 $arguments =& $filter['args'];
 
                 // Apply to the entire row.
-                if (empty($column)) {
+                if (is_null($column)) {
                     $row = call_user_func_array(
                         $callable,
                         array_merge(
