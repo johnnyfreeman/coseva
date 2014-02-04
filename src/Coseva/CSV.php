@@ -314,50 +314,44 @@ class CSV implements IteratorAggregate
      *   offsets, to prevent resultsets from interfering.
      * @return CSV $this
      */
-    public function parse($rowOffset = 0)
+    public function parse($rowOffset = 0, $limit = -1)
     {
         // Cast the row offset as an integer.
         $rowOffset = (int) $rowOffset;
 
-        if (!isset($this->_rows)) {
-            // Open the file if there is no SplFIleObject present.
-            if (!($this->_file instanceof SplFileObject)) {
-                $this->_file = new SplFileObject(
-                    $this->_fileConfig['filename'],
-                    $this->_fileConfig['open_mode'],
-                    $this->_fileConfig['use_include_path']
-                );
+        // Open the file if there is no SplFIleObject present.
+        if (!($this->_file instanceof SplFileObject)) {
+            $this->_file = new SplFileObject(
+                $this->_fileConfig['filename'],
+                $this->_fileConfig['open_mode'],
+                $this->_fileConfig['use_include_path']
+            );
 
-                // Set the flag to parse CSV.
-                $this->_file->setFlags(SplFileObject::READ_CSV);
+            // Set the flag to parse CSV.
+            $this->_file->setFlags(SplFileObject::READ_CSV);
 
-                // Set the delimiter
-                $this->setDelimiter($this->_fileConfig['delimiter']);
-            }
-
-            $this->_rows = array();
-
-            // Fetch the rows.
-            foreach (new LimitIterator($this->_file, $rowOffset) as $key => $row) {
-                // Apply any filters.
-                $this->_rows[$key] = $this->_applyFilters($row);
-
-                // Flush empty rows.
-                if ($this->_flushOnAfterFilter) {
-                    $this->_flushEmptyRow($row, $key, true);
-                }
-            }
-
-            // Flush the filters.
-            $this->flushFilters();
-
-            // We won't need the file anymore.
-            unset($this->_file);
-        } elseif (empty($this->_filters)) {
-            // Nothing to do here.
-            // We return now to avoid triggering garbage collection.
-            return $this;
+            // Set the delimiter
+            $this->setDelimiter($this->_fileConfig['delimiter']);
         }
+
+        $this->_rows = array();
+
+        // Fetch the rows.
+        foreach (new LimitIterator($this->_file, $rowOffset, $limit) as $key => $row) {
+            // Apply any filters.
+            $this->_rows[$key] = $this->_applyFilters($row);
+
+            // Flush empty rows.
+            if ($this->_flushOnAfterFilter) {
+                $this->_flushEmptyRow($row, $key, true);
+            }
+        }
+
+        // Flush the filters.
+        $this->flushFilters();
+
+        // We won't need the file anymore.
+        unset($this->_file);
 
         if (!empty($this->_filters)) {
             // We explicitely divide the strategies here, since checking this
